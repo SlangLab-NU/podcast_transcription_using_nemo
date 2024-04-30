@@ -1,0 +1,1184 @@
+1
+00:00:06,260 --> 00:00:09,281
+Astronomycast, episode one for Monday, September 11, 2006.
+
+2
+00:00:11,401 --> 00:00:12,862
+Pluto and Planethood.
+
+3
+00:00:15,622 --> 00:00:17,363
+Welcome to the Astronomycast.
+
+4
+00:00:17,443 --> 00:00:21,604
+My name is Fraser Cain and I am the Webmaster of Universe today.
+
+5
+00:00:21,624 --> 00:00:28,645
+And I also have with me Pamela Gay, also from Slacker Astronomy fame.
+
+6
+00:00:29,326 --> 00:00:31,026
+And are you there, Pamela?
+
+7
+00:00:31,830 --> 00:00:32,351
+I am here.
+
+8
+00:00:32,651 --> 00:00:33,091
+All right.
+
+9
+00:00:33,872 --> 00:00:35,893
+I wasn't sure I'd be talking to myself but no that's good.
+
+10
+00:00:37,895 --> 00:00:44,880
+So we're our hope with this brand new show and you'll have to you know watch us as we go through our teething pain.
+
+11
+00:00:44,900 --> 00:00:56,449
+As our hope is to cover some of the latest highlights in astronomy news but more did kind of deeper into the background and
+
+12
+00:00:57,149 --> 00:01:02,814
+sort of the underlying explanations of the world of astronomy, a universe of astronomy.
+
+13
+00:01:03,775 --> 00:01:11,482
+And so not just kind of like what's been discovered, what's going on, but actually to say, you know, like how do we know what we know?
+
+14
+00:01:12,182 --> 00:01:13,964
+and trying to get some underlying explanations.
+
+15
+00:01:14,004 --> 00:01:30,157
+And hopefully week after week as we build up an archive of shows, people can kind of look back and when they know about, say, black holes or dark matter, they can listen to some of our shows on those exact subjects and really kind of understand the subject matter a little better.
+
+16
+00:01:30,177 --> 00:01:32,039
+Do you agree, Pamela?
+
+17
+00:01:32,808 --> 00:01:33,929
+I totally agree.
+
+18
+00:01:34,009 --> 00:01:46,378
+We're going to follow the facts through the cosmos and find out where the facts lead us and look at what the facts were initially, what we thought initially and what we know now and what we think these facts that we know now tell us.
+
+19
+00:01:47,355 --> 00:01:55,181
+So if we, if we talk to any astronomer, anyone in the space industry this last couple of months and said, you know, look, what's the, what's the hot story?
+
+20
+00:01:56,102 --> 00:01:57,923
+They'll all tell us it's Pluto.
+
+21
+00:01:58,023 --> 00:01:58,924
+Pluto, Pluto, Pluto.
+
+22
+00:01:59,404 --> 00:02:02,507
+In fact, you know, every question that I got was about Pluto.
+
+23
+00:02:02,547 --> 00:02:03,908
+Pluto, a planet is not a planet.
+
+24
+00:02:04,208 --> 00:02:04,909
+What does that mean?
+
+25
+00:02:05,489 --> 00:02:05,769
+What's it?
+
+26
+00:02:05,869 --> 00:02:06,550
+What is a planet?
+
+27
+00:02:06,670 --> 00:02:08,231
+So we got, we got a lot of that.
+
+28
+00:02:08,731 --> 00:02:16,998
+And, and so we thought we would kind of cover that story a little bit, but also to try and kind of explain a little more deeply what the, what the controversy is.
+
+29
+00:02:18,439 --> 00:02:23,684
+So, let's talk about, let's talk about planets.
+
+30
+00:02:24,645 --> 00:02:27,787
+What's the story so far with Pluto?
+
+31
+00:02:28,868 --> 00:02:36,936
+Well, so Pluto was discovered while back by a guy by the name of Claude Tombaugh working out at Lowell Observatory.
+
+32
+00:02:37,356 --> 00:02:41,620
+Little tiny Spud hanging out in the edge of the universe and for a while it was the biggest thing out there.
+
+33
+00:02:42,728 --> 00:02:49,074
+Then came the announcement of this critter called 2003 UB313, which is bigger than Pluto.
+
+34
+00:02:49,974 --> 00:02:52,997
+And everyone in the media went, ooh, do we have a tenth planet?
+
+35
+00:02:53,818 --> 00:02:58,862
+And the astronomers went, oh no, if there's one bigger, there's probably a lot that are bigger.
+
+36
+00:02:59,282 --> 00:03:02,825
+And people have been wondering for a while, is Pluto a quaper belt object?
+
+37
+00:03:03,186 --> 00:03:03,546
+Is it
+
+38
+00:03:03,982 --> 00:03:04,483
+a planet?
+
+39
+00:03:04,763 --> 00:03:05,563
+Is it both?
+
+40
+00:03:05,684 --> 00:03:07,625
+Do we need to rethink how we name things?
+
+41
+00:03:09,066 --> 00:03:12,469
+So we had to come up with a definition for a planet.
+
+42
+00:03:13,410 --> 00:03:17,313
+Defining things is really hard, and there's a lot of history involved in this.
+
+43
+00:03:18,594 --> 00:03:21,877
+So what is a corporate belt object?
+
+44
+00:03:22,037 --> 00:03:23,539
+It's probably a good place to start.
+
+45
+00:03:25,020 --> 00:03:31,044
+out in the edge of our solar system that we can see with our regular telescopes.
+
+46
+00:03:31,125 --> 00:03:36,329
+We can look out there, and there's this big planet, Neptune, hanging out in a slightly elliptical orbit.
+
+47
+00:03:37,069 --> 00:03:48,138
+And all around it are these proto-commit objects, quiper belt objects, that occasionally get knocked into the inner solar system and become our short period comets.
+
+48
+00:03:49,138 --> 00:04:04,310
+And hanging out in the midst of all of these proto-short period comet objects are bigger objects like Pluto and it's either Moon or some people said it's binary planet object, Chiron.
+
+49
+00:04:05,471 --> 00:04:09,916
+And their orbit is no different than all these other proto-common objects.
+
+50
+00:04:10,756 --> 00:04:12,338
+It cuts across Neptune.
+
+51
+00:04:12,558 --> 00:04:13,799
+It's highly elliptical.
+
+52
+00:04:13,979 --> 00:04:17,483
+It goes on this weird diagonal through the plane of the solar system.
+
+53
+00:04:17,583 --> 00:04:19,384
+It's not like any of the other planets.
+
+54
+00:04:20,786 --> 00:04:23,088
+Seeing just how odd it was, you have to question.
+
+55
+00:04:23,929 --> 00:04:25,130
+It's just like Sesame Street.
+
+56
+00:04:25,190 --> 00:04:26,851
+Which of these objects doesn't belong?
+
+57
+00:04:27,092 --> 00:04:28,313
+Does Pluto belong or not?
+
+58
+00:04:29,517 --> 00:04:42,971
+But if I recall that the controversy's been been happening for quite a few years now, it's not like, you know, with the discovery of UB313 that people said, oh, no, now Pluto, now it really calls it into question.
+
+59
+00:04:42,991 --> 00:04:49,598
+I mean, I know that even in the last four or five years, people have been wandering whether Pluto should be removed.
+
+60
+00:04:50,871 --> 00:04:55,115
+Well, ever since we started finding these quiper belt objects, this question has been around.
+
+61
+00:04:55,255 --> 00:05:03,141
+The smaller quiper belt objects started to show up in the early 90s, and they all had these similar orbits.
+
+62
+00:05:04,182 --> 00:05:08,626
+And quiper belt objects were originally suggested back in, I believe, the 60s.
+
+63
+00:05:09,463 --> 00:05:16,168
+So short period comets had to come from somewhere where they came from appeared to be coincident with Pluto.
+
+64
+00:05:16,768 --> 00:05:28,236
+And if Pluto shares its orbit with a whole bunch of other objects, how is it any different from the really big asteroid series that shares its orbit with a whole bunch of asteroids?
+
+65
+00:05:28,877 --> 00:05:31,338
+So the debate's been around for a long time.
+
+66
+00:05:31,579 --> 00:05:35,762
+And the International Astronomical Union, which is the
+
+67
+00:05:36,842 --> 00:05:45,167
+naming organization, the definition-making organization of the entire astronomical community, put together a working group.
+
+68
+00:05:46,287 --> 00:05:51,090
+And that working group has been trying for a long time to try and figure out how to define a planet.
+
+69
+00:05:51,150 --> 00:05:52,971
+And it just all came to a head this summer.
+
+70
+00:05:53,671 --> 00:05:55,732
+So the debate's been around for a while.
+
+71
+00:05:56,873 --> 00:05:57,653
+What do we do?
+
+72
+00:05:57,754 --> 00:05:59,494
+Do we call series a planet?
+
+73
+00:06:00,875 --> 00:06:02,416
+How do we lump everything together?
+
+74
+00:06:02,556 --> 00:06:10,582
+So it all starts to come down to what makes one object different from another object, and how do the orbits plane to all of this?
+
+75
+00:06:11,563 --> 00:06:13,924
+And where do we put the cutting-off point for a planet?
+
+76
+00:06:15,225 --> 00:06:24,231
+Right, and I guess the discovery of UB313 something larger than Pluto that kind of brings the discussion to a head.
+
+77
+00:06:24,451 --> 00:06:26,993
+So how did it kind of all go down this summer?
+
+78
+00:06:28,308 --> 00:06:29,509
+Well, there's a lot of debates.
+
+79
+00:06:29,969 --> 00:06:35,734
+There was initially the suggestion, well, why don't we call all these big objects planet?
+
+80
+00:06:36,194 --> 00:06:39,197
+Why don't we make UB313 a planet?
+
+81
+00:06:39,297 --> 00:06:44,581
+Why don't we make Pluto and its moon co-object Chirona planet?
+
+82
+00:06:44,982 --> 00:06:46,423
+Why don't we make series a planet?
+
+83
+00:06:46,763 --> 00:06:50,106
+Well, how could you make Pluto and Chirona planet?
+
+84
+00:06:50,126 --> 00:06:51,367
+I mean, is it one and moon or the other?
+
+85
+00:06:52,372 --> 00:06:57,376
+Well, they both orbit a point that's between them.
+
+86
+00:06:57,696 --> 00:07:02,140
+Pluto goes in a small circle around a point outside of its body.
+
+87
+00:07:03,101 --> 00:07:06,603
+And Sharon also goes around the same point as at a larger distance.
+
+88
+00:07:07,184 --> 00:07:10,386
+So it's more of a binary system, just like we have binary stars.
+
+89
+00:07:10,586 --> 00:07:14,349
+We also have Pluto and Sharon, which are binary to one another.
+
+90
+00:07:14,409 --> 00:07:18,793
+So they co-orbit a central point that is outside of Pluto.
+
+91
+00:07:19,631 --> 00:07:20,031
+Oh, okay.
+
+92
+00:07:20,051 --> 00:07:24,895
+And so the central point between, say, the earth and the moon is actually inside the earth, right?
+
+93
+00:07:25,275 --> 00:07:25,996
+Inside the earth.
+
+94
+00:07:26,276 --> 00:07:29,138
+So the moon is clearly going around and around the earth.
+
+95
+00:07:29,358 --> 00:07:35,222
+Whereas Sharon and Pluto, they go around a point external to both of them.
+
+96
+00:07:35,422 --> 00:07:36,623
+So it's a binary system.
+
+97
+00:07:36,743 --> 00:07:38,465
+So they can be binary planets.
+
+98
+00:07:38,845 --> 00:07:39,886
+But are they planets?
+
+99
+00:07:41,087 --> 00:07:44,309
+And so there was an initial talk.
+
+100
+00:07:44,409 --> 00:07:45,890
+Do we make all these things planets?
+
+101
+00:07:46,230 --> 00:07:48,612
+Do we suddenly make the solar system much bigger?
+
+102
+00:07:49,085 --> 00:07:51,571
+And anything new that fits that criteria as well.
+
+103
+00:07:52,353 --> 00:07:55,480
+And anything new that fits that criteria also becomes a planet.
+
+104
+00:07:55,851 --> 00:08:00,174
+Well, if we could have 100 planets, a thousand planets, just go on and on and on.
+
+105
+00:08:00,954 --> 00:08:01,575
+Exactly.
+
+106
+00:08:01,595 --> 00:08:02,576
+Yeah, that went over well.
+
+107
+00:08:03,776 --> 00:08:04,177
+Not really.
+
+108
+00:08:06,178 --> 00:08:09,320
+So it was sort of decided, no, that doesn't work.
+
+109
+00:08:09,420 --> 00:08:11,401
+Let's come up with something different.
+
+110
+00:08:11,541 --> 00:08:25,551
+So let's start thinking about what are the common traits of our definite planets, the things that we know for certain we want to call a planet, like Earth, Mars, Jupiter, Saturn, these
+
+111
+00:08:26,451 --> 00:08:32,735
+nice fairly large objects, things that basically no question.
+
+112
+00:08:34,876 --> 00:08:39,178
+So we start looking, what are the general traits of a planet?
+
+113
+00:08:39,438 --> 00:08:40,659
+Well, there's spheres.
+
+114
+00:08:41,699 --> 00:08:44,000
+This eliminates Sirus from being a moon.
+
+115
+00:08:44,280 --> 00:08:45,341
+It's not round.
+
+116
+00:08:45,861 --> 00:08:49,243
+It's gravitational self-gravity is such that
+
+117
+00:08:50,191 --> 00:08:51,591
+It can be lumpy and bumpy.
+
+118
+00:08:51,991 --> 00:09:02,153
+And as the gravity of the entire asteroid pulls all the pieces together, it's not strong enough to smooth everything into a nice round sphere.
+
+119
+00:09:03,053 --> 00:09:09,895
+Scientifically, what we say is its self-gravity can't overcome rigid body forces, big mountains, big lumps.
+
+120
+00:09:09,975 --> 00:09:16,716
+They stay there, such that it doesn't assume a nearly round shape because it's an hydrostatic equilibrium.
+
+121
+00:09:16,836 --> 00:09:18,156
+So we tossed serous.
+
+122
+00:09:18,496 --> 00:09:30,278
+Right, I've heard that Mount Everest here on Earth, for example, is the maximum size you can have a mountain and that any larger is just getting smashed or squished at the bottom as fast as it's growing on the top.
+
+123
+00:09:31,303 --> 00:09:33,824
+And this is because we have a large planet.
+
+124
+00:09:34,064 --> 00:09:37,605
+It squishes large mountains and makes them just not get any bigger.
+
+125
+00:09:37,785 --> 00:09:41,986
+If you go to Mars, which is a smaller planet, you can get bigger mountains.
+
+126
+00:09:42,166 --> 00:09:48,968
+Olympus Mons on Mars is much bigger than Mount Everest because the self-gravity of Mars is lower than the self-gravity of Earth.
+
+127
+00:09:50,209 --> 00:09:53,369
+Serious, the self-gravity just isn't enough to make it a sphere.
+
+128
+00:09:53,609 --> 00:09:54,690
+So not a planet.
+
+129
+00:09:54,770 --> 00:09:55,690
+Okay, but I got a wrench for you.
+
+130
+00:09:55,730 --> 00:09:58,611
+Isn't Saturn a kind of squished ball?
+
+131
+00:09:59,798 --> 00:10:04,531
+Well, there's a difference between a squished ball and a potato.
+
+132
+00:10:06,044 --> 00:10:07,405
+all the planets are squished balls.
+
+133
+00:10:07,906 --> 00:10:13,050
+You take something that's spherical and you spin it and it's going to flatten.
+
+134
+00:10:13,811 --> 00:10:14,952
+You spin it too flat.
+
+135
+00:10:15,692 --> 00:10:17,334
+You spin it too fast rather.
+
+136
+00:10:17,634 --> 00:10:18,555
+It becomes a pancake.
+
+137
+00:10:19,796 --> 00:10:24,160
+None of our planets are spinning that fast, which is good because they'd probably fall apart.
+
+138
+00:10:26,101 --> 00:10:33,628
+But Saturn, Jupiter, even our Sun is a slightly squished ball because they're rotating and this causes the center to bow out.
+
+139
+00:10:35,890 --> 00:10:41,695
+It's the same principle that when you're on a merry-go-round that's going way too fast, you want to fly off the edge.
+
+140
+00:10:41,875 --> 00:10:46,119
+The equators of the planet want to fly out, but gravity holds them in.
+
+141
+00:10:46,579 --> 00:10:48,441
+Okay, so smooth.
+
+142
+00:10:48,481 --> 00:10:49,582
+We've got a smooth ball.
+
+143
+00:10:50,242 --> 00:10:50,823
+Smooth ball.
+
+144
+00:10:51,083 --> 00:10:51,844
+That's our first one.
+
+145
+00:10:52,664 --> 00:10:58,229
+So the next characteristic we look at is, so is it orbiting something else?
+
+146
+00:10:58,869 --> 00:11:04,014
+We have these giant moons that are in fact much bigger than Pluto.
+
+147
+00:11:05,200 --> 00:11:08,903
+Why don't we call the giant moons of Jupiter planets?
+
+148
+00:11:09,243 --> 00:11:13,667
+Some of them have all the characteristics that we're used to seeing in planets, volcanism.
+
+149
+00:11:13,787 --> 00:11:16,630
+They, in some cases, appear to have liquid water.
+
+150
+00:11:16,670 --> 00:11:17,771
+They have atmospheres.
+
+151
+00:11:18,331 --> 00:11:21,393
+But there's satellites of another object.
+
+152
+00:11:22,214 --> 00:11:26,298
+So a planet cannot be the satellite of another object.
+
+153
+00:11:26,398 --> 00:11:30,641
+It has to be orbiting the sun as it's primary thing that it's orbiting.
+
+154
+00:11:31,102 --> 00:11:33,944
+So planets are things that orbit stars.
+
+155
+00:11:34,471 --> 00:11:39,674
+So even though Titan is large and smooth, it's out.
+
+156
+00:11:40,414 --> 00:11:41,695
+Because it goes out.
+
+157
+00:11:41,735 --> 00:11:42,836
+Because it goes around Saturn.
+
+158
+00:11:43,476 --> 00:11:44,237
+It is a moon.
+
+159
+00:11:45,317 --> 00:11:54,783
+Or in this case, when we're talking about going around, it means that the center point that the two are orbiting is inside Saturn.
+
+160
+00:11:54,823 --> 00:11:55,463
+So it doesn't count.
+
+161
+00:11:56,244 --> 00:11:56,724
+Exactly.
+
+162
+00:11:56,804 --> 00:12:00,406
+But it must be just like a teeny-weeny bit away from the center of Saturn.
+
+163
+00:12:01,201 --> 00:12:11,164
+Yeah, it's whenever you get more than one body, they end up not orbiting the true center of an object, but some point that's the gravitational center of the two objects.
+
+164
+00:12:11,184 --> 00:12:13,565
+This is how we're able to find extra solar planets.
+
+165
+00:12:13,745 --> 00:12:15,226
+Planets pull on stars.
+
+166
+00:12:15,506 --> 00:12:19,847
+So stars are actually orbiting some point that's inside of them.
+
+167
+00:12:20,908 --> 00:12:22,968
+Okay, so we've got smooth balls.
+
+168
+00:12:23,048 --> 00:12:28,650
+We've got only orbiting the star, not orbiting some other object.
+
+169
+00:12:29,491 --> 00:12:30,451
+And then what's the third?
+
+170
+00:12:31,667 --> 00:12:37,069
+So next we look around and see, okay, what's hanging out around the object in question?
+
+171
+00:12:38,249 --> 00:12:45,852
+Big planets, even some of the smaller ones like, say, Earth, we have our orbits pretty much to ourselves.
+
+172
+00:12:46,493 --> 00:12:57,837
+As the Earth swings around the sun every year, we do cross things in our paths, comets that go through the orbit of the Earth tend to leave dirt behind, and when we collide with this, we get meteor showers.
+
+173
+00:12:59,237 --> 00:13:09,521
+But more or less, the orb of the Earth is a nice, big, empty area that occasionally gets crossed by the orbits of asteroids or comets, but nothing lives in our orbit.
+
+174
+00:13:09,661 --> 00:13:14,323
+We have our orbit to ourselves, other things pass through, but they don't stay there.
+
+175
+00:13:15,384 --> 00:13:16,684
+If they do stay there, we eat them.
+
+176
+00:13:17,625 --> 00:13:20,046
+Hopefully, without too much destruction to our planet.
+
+177
+00:13:22,727 --> 00:13:24,168
+Or veer them off into space.
+
+178
+00:13:25,349 --> 00:13:28,170
+We're not quite sure how to do that yet, but it's a good goal.
+
+179
+00:13:30,352 --> 00:13:38,296
+So when you look around the orbit of an object, you look to see is the orbit empty of other stuff.
+
+180
+00:13:38,677 --> 00:13:40,718
+This implies that while the planet was forming,
+
+181
+00:13:41,638 --> 00:13:58,127
+It ate up all the material in its orbital path, made it part of itself, or through interactions flung it into other parts of the solar system, and thus the planet lives in an area of the solar system that has been cleared out.
+
+182
+00:13:59,788 --> 00:14:01,709
+This is where Pluto gets itself into trouble.
+
+183
+00:14:02,750 --> 00:14:07,533
+Pluto is in a three to two orbital resonance with Neptune.
+
+184
+00:14:08,053 --> 00:14:12,897
+This means that for every three times Neptune goes around the Sun, it goes around twice.
+
+185
+00:14:13,457 --> 00:14:15,558
+And there's a whole lot of things that do that.
+
+186
+00:14:16,619 --> 00:14:19,441
+A whole class of objects that do this.
+
+187
+00:14:21,674 --> 00:14:26,818
+Oh, sorry, but Pluto and Neptune aren't actually in the same orbit, right?
+
+188
+00:14:26,858 --> 00:14:35,265
+Like Pluto has this kind of elliptical orbit that's kind of inclined off the plane and kind of zooms in past Neptune and then back out again, right?
+
+189
+00:14:36,684 --> 00:14:42,067
+Exactly, but Pluto crosses through that orbit, and it's not the only thing crossing through Neptune's orbit.
+
+190
+00:14:42,647 --> 00:14:51,032
+There are a whole lot of different objects that are all crossing back and forth through Neptune's orbit.
+
+191
+00:14:51,072 --> 00:14:51,572
+These are
+
+192
+00:14:52,072 --> 00:14:58,734
+transneptunian objects, and the ones that share Pluto's type of orbit are called Plutinos.
+
+193
+00:15:00,174 --> 00:15:03,275
+So Pluto isn't orbiting by itself.
+
+194
+00:15:03,415 --> 00:15:08,196
+It's sharing its orbit with a whole bunch of other little objects, and in some cases bigger objects.
+
+195
+00:15:08,556 --> 00:15:12,937
+So are these objects that are also kind of locked into that same orbital resonance with Neptune?
+
+196
+00:15:13,789 --> 00:15:17,571
+Yes, these are all objects that have a three to two resonance with Neptune.
+
+197
+00:15:18,571 --> 00:15:19,552
+These are called Plutinos.
+
+198
+00:15:20,672 --> 00:15:23,714
+And so Pluto is not unique.
+
+199
+00:15:23,894 --> 00:15:28,076
+It's in a class of orbits with a whole bunch of other objects.
+
+200
+00:15:28,877 --> 00:15:31,238
+It's just the biggest one we've found so far.
+
+201
+00:15:32,238 --> 00:15:39,083
+It's a fairly reflective object, so it reflects lots of light from the sun back to where we can observe it here on Earth.
+
+202
+00:15:39,883 --> 00:15:46,268
+We've detected it, but who's to say there isn't a really dirty Pluto out there that we just haven't detected yet?
+
+203
+00:15:47,188 --> 00:15:49,970
+There's lots of smaller stuff that we've already found in that orbit.
+
+204
+00:15:51,531 --> 00:15:57,215
+So here's where the IAU kicks Pluto out of planet classification.
+
+205
+00:15:57,984 --> 00:16:03,337
+The definition now says it has to have cleared its orbital neighborhood of other stuff.
+
+206
+00:16:03,878 --> 00:16:07,226
+And Pluto's orbit is jam packed with other stuff.
+
+207
+00:16:08,007 --> 00:16:14,531
+Now, I've heard that people, obviously this didn't go well for a lot of Pluto fans.
+
+208
+00:16:15,972 --> 00:16:35,603
+And from what I've heard, a lot of people saying, well, it's that third definition that's really the kicker because there are a lot of other planets that do other objects in their same orbit, like there's a series of asteroids that go before and after Jupiter, for example, in its orbit.
+
+209
+00:16:36,280 --> 00:16:37,781
+Yeah, these are the Trojan asteroids.
+
+210
+00:16:38,101 --> 00:16:53,932
+So what happens is as things go flying through the universe and specifically flying through our solar system, they interact with other bodies, and over time where they started isn't necessarily where they ended up.
+
+211
+00:16:54,852 --> 00:16:56,713
+And Jupiter has a lot of gravity.
+
+212
+00:16:57,014 --> 00:17:00,476
+It's other than the sun, the largest thing in our solar system.
+
+213
+00:17:01,477 --> 00:17:04,899
+And it tends to capture asteroids and comets in
+
+214
+00:17:05,479 --> 00:17:06,880
+what are called Lagrange points.
+
+215
+00:17:07,020 --> 00:17:19,708
+These are places where objects can get trapped so that they're gravitationally balanced between Jupiter and the Sun and basically co-orbit with Jupiter, either leading it or trailing it.
+
+216
+00:17:20,889 --> 00:17:23,490
+But these objects didn't necessarily form in those orbits.
+
+217
+00:17:23,930 --> 00:17:26,471
+They probably got captured and got stuck there.
+
+218
+00:17:27,551 --> 00:17:30,833
+We tend to stick satellites in the Lagrange points of the Earth.
+
+219
+00:17:31,053 --> 00:17:36,995
+It's just a nice happy place to stick objects in their fairly stable, depending on which Lagrange points you stick them in.
+
+220
+00:17:38,075 --> 00:17:42,658
+So when you look at Jupiter, you're not looking at stuff that hasn't been cleared out of Jupiter's orbit.
+
+221
+00:17:42,778 --> 00:17:45,999
+You're looking at stuff that has been trapped in Jupiter's orbit.
+
+222
+00:17:46,800 --> 00:17:57,546
+So there's a difference between not clearing your orbit and clearing your orbit and then deciding you're going to gravitationally grab some junk and trap it there.
+
+223
+00:17:58,786 --> 00:18:01,428
+And that's what we're looking at when we look at the Trojan asteroids.
+
+224
+00:18:02,308 --> 00:18:16,873
+So now, with this definition of planethood, if we do find a large planet further out past, you know, past UB313, that fulfills that requirement, then they would necessarily have to call it a planet again.
+
+225
+00:18:16,913 --> 00:18:18,173
+So we might get nine planets again.
+
+226
+00:18:18,193 --> 00:18:20,414
+But I'm- It's possible to have nine planets, yeah.
+
+227
+00:18:20,794 --> 00:18:29,217
+But then I'm wondering what, how this definition, is this just for the solar system or does this definition work with extra solar planetary systems as well?
+
+228
+00:18:29,878 --> 00:18:35,342
+Well, it should work with extra solar system, extra solar planetary systems.
+
+229
+00:18:35,723 --> 00:18:45,630
+The catch is going to be being flexible because as we look at other stars, currently we can't see everything that is orbiting a particular star.
+
+230
+00:18:45,690 --> 00:18:52,115
+We're able to pick up the giant planets, the things that are Jupiter mass, fairly consistently.
+
+231
+00:18:52,776 --> 00:18:56,018
+There's over 2,000 known extra solar planets, not 2,200 extra solar planets at this point.
+
+232
+00:18:59,941 --> 00:19:02,103
+And we're slowly starting to find the small stuff.
+
+233
+00:19:03,104 --> 00:19:10,191
+And as we look at other stars, we're seeing discs around them when they're young and still forming.
+
+234
+00:19:10,471 --> 00:19:17,418
+And in several cases, we can actually see cleared out regions in these dust discs that we believe are places
+
+235
+00:19:17,918 --> 00:19:21,519
+where a planet is forming and has already cleared out its orbital path.
+
+236
+00:19:22,079 --> 00:19:27,640
+So when we find that object in that cleared out area of the dust disk, that's a planet.
+
+237
+00:19:28,541 --> 00:19:41,404
+But when we start finding things using perhaps gravitational micro-lensing technique where a star will pass in front of a background star and
+
+238
+00:19:41,984 --> 00:19:53,508
+Its gravity will cause light that would otherwise shoot off to some other part of the galaxy to get bent back towards us, thus increasing the amount of light in total that we're able to see here on Earth.
+
+239
+00:19:54,149 --> 00:20:10,835
+Well, when this happens and there's a planet involved, that planet's gravity also gets in on the bending light activity, and we're able to detect smaller planets this way through their gravitational interactions with objects further off in the galaxy.
+
+240
+00:20:11,295 --> 00:20:15,958
+Yeah, with the traditional methods, we can only find them a few hundred light years away.
+
+241
+00:20:16,238 --> 00:20:22,202
+And I know that with this someone saw found a planet using gravitational microlensing like 10,000 light years away.
+
+242
+00:20:22,783 --> 00:20:37,612
+Yeah, it's one of these fascinating new techniques that gravity is a powerful thing and it's allowing us to make powerful measurements of little tiny planets or at least 14 earth mass planets out further out in the galaxy.
+
+243
+00:20:37,632 --> 00:20:40,194
+The only problem is as we can't confirm these discoveries.
+
+244
+00:20:41,154 --> 00:20:52,586
+gravitational lensing events, you see them and then they're over and you don't get a second shot, but it will help us determine the frequency at which these planets are out there.
+
+245
+00:20:53,147 --> 00:21:02,437
+But since we only get one shot and we can't go back and look for additional objects in the same orbits, who's to say there aren't a bunch of
+
+246
+00:21:03,718 --> 00:21:15,614
+I don't think this is rational, but who's to say there aren't a bunch of 14 earth mass planets and the exact same orbit, in which case they're no longer planets because they haven't cleared their orbit?
+
+247
+00:21:16,835 --> 00:21:17,957
+So we have to be flexible.
+
+248
+00:21:17,997 --> 00:21:20,240
+We have to be willing to say, well, we think it's a planet.
+
+249
+00:21:20,620 --> 00:21:27,808
+But we haven't fully explored that extra solar solar system to see what all is in it.
+
+250
+00:21:28,248 --> 00:21:37,238
+So the definition should stand, but we need to recognize that what may be a planet today, tomorrow we may realize is not really a planet.
+
+251
+00:21:38,206 --> 00:21:43,748
+Well, I don't know whether the Pluto fans are going to take this line down.
+
+252
+00:21:43,768 --> 00:21:53,633
+I know that already there are petitions in the works to try and get the IAU to overturn the decision soon or at least by the time of its next meeting.
+
+253
+00:21:53,653 --> 00:22:07,459
+I know there was a very low, actually a very low turnout at the meeting, and I think something like only 5% of the people at the meeting actually voted for the, or 5% of people in the international astronomical union voted for
+
+254
+00:22:07,779 --> 00:22:12,941
+for this book-changing definition.
+
+255
+00:22:13,461 --> 00:22:17,083
+Well, part of the problem was, is the final vote ended up happening on the last day.
+
+256
+00:22:17,103 --> 00:22:26,726
+And anyone who's gone to a big conference knows that the last day is often the day during which a lot of people have had to catch planes and they're just not there anymore.
+
+257
+00:22:28,347 --> 00:22:35,410
+There's also a vested interest in this for every elementary school teacher who doesn't have the budget to buy new textbooks.
+
+258
+00:22:36,491 --> 00:22:44,118
+Um, there's a vested interest in all the poster makers who've already made 10,000 posters showing Pluto as a planet.
+
+259
+00:22:44,638 --> 00:22:46,300
+Walt Disney is going to be mad.
+
+260
+00:22:46,800 --> 00:22:47,341
+Walt Disney.
+
+261
+00:22:47,501 --> 00:22:49,343
+Oh, that poor pseudo dog.
+
+262
+00:22:49,683 --> 00:22:50,965
+Yeah.
+
+263
+00:22:51,105 --> 00:22:52,766
+He's never been given any respect.
+
+264
+00:22:52,946 --> 00:22:55,589
+And now he's not even named after a planet.
+
+265
+00:22:55,669 --> 00:22:57,671
+He's named after a dwarf planet.
+
+266
+00:23:00,165 --> 00:23:00,525
+Perfect.
+
+267
+00:23:01,486 --> 00:23:01,786
+Great.
+
+268
+00:23:01,826 --> 00:23:11,453
+Well, that was all I think all we needed to know about Pluto and its unplanetating, its replaneting, and then its unplanetating.
+
+269
+00:23:12,854 --> 00:23:21,881
+And maybe if Pluto becomes a planet again, or if there's anything new in the dwarf planet news, we'll bring that back up.
+
+270
+00:23:21,921 --> 00:23:22,941
+Now, where are you now?
+
+271
+00:23:24,632 --> 00:23:28,275
+I'm at Southern Illinois University in Edwardsville, Illinois.
+
+272
+00:23:28,575 --> 00:23:31,717
+It's right across the river from the city of St.
+
+273
+00:23:31,757 --> 00:23:32,878
+Louis in Missouri.
+
+274
+00:23:33,038 --> 00:23:41,363
+So it's the land of bluffs, corn, tornadoes, and a really pretty little town with a nice little state university.
+
+275
+00:23:42,144 --> 00:23:44,846
+And your teaching astronomy there?
+
+276
+00:23:45,806 --> 00:23:48,608
+This semester, I'm actually not teaching astronomy.
+
+277
+00:23:48,728 --> 00:23:51,730
+I'm teaching space physics, which we're focusing on orbits.
+
+278
+00:23:53,743 --> 00:23:57,604
+I'm teaching physics for pre-meds because doctors need to know physics too.
+
+279
+00:23:59,305 --> 00:23:59,645
+Awesome.
+
+280
+00:23:59,725 --> 00:24:08,708
+Okay, so now you can find our show at astronomycast.com and you can send us some email if you want.
+
+281
+00:24:08,788 --> 00:24:11,709
+Any questions, comments, or feedback, please go gentle on us.
+
+282
+00:24:11,729 --> 00:24:14,690
+This is the first time we're still trying to get into our groove.
+
+283
+00:24:14,710 --> 00:24:17,992
+I'm sure by show 100, we'll be very smooth.
+
+284
+00:24:18,672 --> 00:24:21,733
+But right now we're very stilted and we'll get better.
+
+285
+00:24:22,493 --> 00:24:26,155
+But anyway, you can send us an email at infoatastronomycast.com.
+
+286
+00:24:27,415 --> 00:24:42,242
+And if you send us an email, maybe with a question, then maybe Pamela can have a run at it, or maybe we'll seek outside and find a bigger brain and maybe talk to some other professional astronomers and get some answers for people.
+
+287
+00:24:44,023 --> 00:24:58,029
+Now this, for people who may know, I run the website Universe today and I run a fairly large discussion forum with my good friend Dr. Phil Plait and so who runs Bad Astronomy.
+
+288
+00:24:58,149 --> 00:25:04,131
+And so our forum together is the Bad Astronomy Universe today forum or boutforum.com.
+
+289
+00:25:04,251 --> 00:25:08,073
+And so we're going to tie in the comments from
+
+290
+00:25:08,793 --> 00:25:11,475
+for astronomy cast into that forum as well.
+
+291
+00:25:11,575 --> 00:25:24,205
+So, if you've never been there, you get a chance to sign up and then you can join the conversation about this show, but you can also talk about other space and astronomy stuff with a fairly large community of people.
+
+292
+00:25:25,805 --> 00:25:33,667
+And other than that, I think thank you very much for listening for me, for Dr. Pamela Gay.
+
+293
+00:25:33,887 --> 00:25:42,329
+Hopefully we can explain the universe to you a week after week, and we appreciate you taking the time to listen to us.
+
+294
+00:25:45,670 --> 00:25:49,571
+This has been AstronomyCast, a weekly fact-space journey through the cosmos.
+
+295
+00:25:50,291 --> 00:25:51,852
+Music provided by Travis Sur.
+
+296
+00:25:52,252 --> 00:25:53,012
+Thanks for listening.
+

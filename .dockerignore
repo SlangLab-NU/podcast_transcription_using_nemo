@@ -1,0 +1,15 @@
+# Ignore directories starting with a dot
+.*
+
+# Ignore Python cache files
+__pycache__
+
+# Ignore editor-specific files
+.vscode/
+
+# Ignore Docker-related files
+.dockerignore
+Dockerfile
+
+# Ignore 'sample' files
+sample/
