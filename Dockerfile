@@ -1,24 +1,41 @@
-# Use an official Python runtime as a parent image
-FROM continuumio/miniconda3:latest
+# Use Python 3.8 as the base image
+FROM python:3.8
 
-# Create Python 3.10 environment and install PyTorch
-RUN conda create --name whisperx python=3.10 && \
-    /bin/bash -c "source activate whisperx && \
-    conda install -y pytorch==2.0.0 torchaudio==2.0.0 pytorch-cuda=11.8 -c pytorch -c nvidia && \
-    conda clean -afy && \
-    pip install git+https://github.com/m-bain/whisperx.git pyannote.audio && \
-    pip install huggingface-hub pyannote.audio && \
-    apt-get update && apt-get install -y ffmpeg vim && \
-    rm -rf /var/lib/apt/lists/*"
+# Install required system dependencies
+RUN apt-get update && apt-get install -y git sox ffmpeg wget unzip
 
-# Set the working directory in the container
-WORKDIR /whisperx_root
+# Install Python dependencies
+RUN pip install numpy omegaconf scipy torch torchvision torchaudio Flask gunicorn
 
-# Copy the current directory contents into the container at /app
-COPY . /whisperx_root
+# Install Cython for NeMo
+RUN pip install Cython
 
-# Expose the port the app runs on
+# Clone NeMo repository and install NeMo ASR
+ARG BRANCH=r1.13.0
+RUN pip install git+https://github.com/NVIDIA/NeMo.git@$BRANCH#egg=nemo_toolkit[asr]
+
+# Download and unzip the ASR model
+RUN mkdir -p /nemo_asr_root/model && \
+    wget --content-disposition https://api.ngc.nvidia.com/v2/models/nvidia/nemo/stt_en_conformer_ctc_xlarge/versions/1.10.0/zip -O stt_en_conformer_ctc_xlarge_1.10.0.zip && \
+    unzip stt_en_conformer_ctc_xlarge_1.10.0.zip -d /nemo_asr_root/model && \
+    rm stt_en_conformer_ctc_xlarge_1.10.0.zip
+
+# Create a output directory
+RUN mkdir -p /nemo_asr_root/output
+RUN mkdir -p /nemo_asr_root/sample
+
+# Set the working directory
+WORKDIR /nemo_asr_root
+
+# Copy your scripts and configuration files into the container
+COPY run_transcribe.sh /nemo_asr_root/run_transcribe.sh
+COPY transcribe.py /nemo_asr_root/transcribe.py
+COPY run_check_output.sh /nemo_asr_root/run_check_output.sh
+COPY manifest.json /nemo_asr_root/manifest.json
+COPY sample/ac001_2006-09-10.wav /nemo_asr_root/sample/ac001_2006-09-10.wav
+
+# Expose the port the nemo_asr_root runs on
 EXPOSE 5000
 
-# Define the command to run the application
-CMD ["whisperx"]
+# Define the command to run the nemo_asr_rootlication
+CMD ["bash", "run_transcribe.sh"]
