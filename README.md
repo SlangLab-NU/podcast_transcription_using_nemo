@@ -29,6 +29,116 @@ For example, to build the Docker image with the user name `macarious`, use the f
 
 `docker build -t macarious/nemo_asr .`
 
+
+## Running Docker on Local Machine
+
+Run the Docker image on your local machine using the following command:
+
+`docker run [docker_user_name]/nemo_asr`
+
+For example, to run the Docker image with the user name `macarious`, use the following command:
+
+`docker run macarious/nemo_asr`
+
+The following is the output of the Docker image:
+
+```
+----------------------------------------
+Start of script
+Transcribing .mp3 files in the input directory...
+[NeMo W 2024-05-01 10:23:30 optimizers:55] Apex was not found. Using the lamb or fused_adam optimizer will error out.
+Manifest file: /nemo_asr_root/manifest.json
+ASR model path: /nemo_asr_root/model/stt_en_conformer_ctc_xlarge.nemo
+Output directory: /nemo_asr_root/output
+[NeMo I 2024-05-01 10:23:41 mixins:170] Tokenizer SentencePieceTokenizer initialized with 128 tokens
+[NeMo W 2024-05-01 10:23:41 modelPT:142] If you intend to do training or fine-tuning, please call the ModelPT.setup_training_data() method and provide a valid configuration file to setup the train data loader.
+    Train config :
+    manifest_filepath:
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket1/tarred_audio_manifest.json
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket2/tarred_audio_manifest.json
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket3/tarred_audio_manifest.json
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket4/tarred_audio_manifest.json
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket5/tarred_audio_manifest.json
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket6/tarred_audio_manifest.json
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket7/tarred_audio_manifest.json
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket8/tarred_audio_manifest.json
+    sample_rate: 16000
+    batch_size: 1
+    shuffle: true
+    num_workers: 4
+    pin_memory: true
+    use_start_end_token: false
+    trim_silence: false
+    max_duration: 20
+    min_duration: 0
+    is_tarred: true
+    tarred_audio_filepaths:
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket1/audio__OP_0..8191_CL_.tar
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket2/audio__OP_0..8191_CL_.tar
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket3/audio__OP_0..8191_CL_.tar
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket4/audio__OP_0..8191_CL_.tar
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket5/audio__OP_0..8191_CL_.tar
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket6/audio__OP_0..8191_CL_.tar
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket7/audio__OP_0..8191_CL_.tar
+    - - /data/NeMo_ASR_SET/English/v3.0/train_bucketed/bucket8/audio__OP_0..8191_CL_.tar
+    shuffle_n: 2048
+    bucketing_strategy: synced_randomized
+    bucketing_batch_size:
+    - 64
+    - 64
+    - 32
+    - 32
+    - 16
+    - 16
+    - 16
+    - 16
+
+[NeMo W 2024-05-01 10:23:41 modelPT:149] If you intend to do validation, please call the ModelPT.setup_validation_data() or ModelPT.setup_multiple_validation_data() method and provide a valid configuration file to setup the validation data loader(s).
+    Validation config :
+    manifest_filepath:
+    - /data/librispeech_withsp2/manifests/librivox-dev-other.json
+    - /data/librispeech_withsp2/manifests/librivox-dev-clean.json
+    - /data/librispeech_withsp2/manifests/librivox-test-other.json
+    - /data/librispeech_withsp2/manifests/librivox-test-clean.json
+    sample_rate: 16000
+    batch_size: 4
+    shuffle: false
+    num_workers: 4
+    pin_memory: true
+    use_start_end_token: false
+    is_tarred: false
+    tarred_audio_filepaths: na
+    min_duration: 0
+
+[NeMo W 2024-05-01 10:23:41 modelPT:155] Please call the ModelPT.setup_test_data() or ModelPT.setup_multiple_test_data() method and provide a valid configuration file to setup the test data loader(s).
+    Test config :
+    manifest_filepath:
+    - /data/librispeech_withsp2/manifests/librivox-test-other.json
+    - /data/librispeech_withsp2/manifests/librivox-dev-clean.json
+    - /data/librispeech_withsp2/manifests/librivox-dev-other.json
+    - /data/librispeech_withsp2/manifests/librivox-test-clean.json
+    sample_rate: 16000
+    batch_size: 4
+    shuffle: false
+    num_workers: 4
+    pin_memory: true
+    use_start_end_token: false
+    is_tarred: false
+    tarred_audio_filepaths: na
+
+[NeMo I 2024-05-01 10:23:41 features:225] PADDING: 0
+[NeMo I 2024-05-01 10:23:48 save_restore_connector:243] Model EncDecCTCModelBPE was successfully restored from /nemo_asr_root/model/stt_en_conformer_ctc_xlarge.nemo.
+Transcribing:   0%|          | 0/1 [00:00<?, ?it/s][NeMo W 2024-05-01 10:23:48 nemo_logging:349] /usr/local/lib/python3.8/site-packages/torch/functional.py:665: UserWarning: stft with return_complex=False is deprecated. In a future pytorch release, stft will return complex tensors for all inputs, and return_complex=False will raise an error.
+    Note: you can still call torch.view_as_real on the complex output to recover the old return format. (Triggered internally at ../aten/src/ATen/native/SpectralOps.cpp:873.)
+      return _VF.stft(input, n_fft, hop_length, win_length, window,  # type: ignore[attr-defined]
+
+Transcribing: 100%|██████████| 1/1 [00:04<00:00,  4.24s/it]
+Transcription:  astronomy cast episode one for monday september eleventh two thousand and six pluto and planet hood welcome to the astronomy cast my name is fraser kane and i am the webmaster of universe today and i also have with me pamela gay also from slacker astronomy fame and i
+End of script
+----------------------------------------
+```
+
+<!-- 
 Push the Docker to Docker Hub so that it can be pulled to the Cluster:
 
 `docker push [docker_user_name]/nemo_asr:latest`
@@ -121,4 +231,4 @@ Follow the installation instructions on the [NeMo GitHub page](https://github.co
 
 Without a GPU, when running the whipserx on local machines, instead of `--compute_type float32`, the `--compute_type int8` is used to run the model on CPU. Use the following command to run whisperx on an individual file:
 
-`whisperx /input/ac/ac001_2006-09-10.mp3 --output_dir /output --output_format json --suppress_numerals --compute_type int8`
+`whisperx /input/ac/ac001_2006-09-10.mp3 --output_dir /output --output_format json --suppress_numerals --compute_type int8` -->
