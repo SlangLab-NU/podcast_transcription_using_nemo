@@ -16,28 +16,37 @@ def transcribe_audio(manifest_file, asr_model_path, output_dir):
     with open(manifest_file, "r") as f:
         manifest_data = json.load(f)
 
-    # # Transcribe each audio file in the manifest
-    # for item in manifest_data:
-    #     audio_file_path = item["audio_filepath"]
+    # Transcribe each audio file in the manifest
+    for item in manifest_data:
+        # audio_file_path = item["audio_filepath"]
 
-    #     input_file_name = os.path.basename(audio_file_path)
+        # input_file_name = os.path.basename(audio_file_path)
 
-    #     output_file_name = os.path.splitext(input_file_name)[0] + ".json"
-    #     output_file_path = os.path.join(output_dir, output_file_name)
+        # output_file_name = os.path.splitext(input_file_name)[0] + ".json"
+        output_file_name = "transcription.json"
+        output_file_path = os.path.join(output_dir, output_file_name)
 
-    #     # Transcribe audio using NeMo ASR
-    #     tr = transcribe_partial_audio(
-    #         asr_model=asr_model_subword, path2manifest=manifest_file, return_hypotheses=True)
+        # Transcribe audio using NeMo ASR
+        tr = transcribe_partial_audio(
+            asr_model=asr_model_subword, path2manifest=manifest_file, return_hypotheses=True)
 
-    #     # Save transcription to a JSON file
-    #     with open(output_file_path, "w") as outfile:
-    #         json.dump(tr, outfile)
+        # Extract relevant data from the Hypothesis object
+        transcription_data = {
+            "text": tr[0].text,
+            "timestep": tr[0].timestep,
+            "token_confidence": tr[0].token_confidence,
+            "word_confidence": tr[0].word_confidence,
+        }
 
-    # Transcribe audio using NeMo ASR
-    tr = transcribe_partial_audio(
-        asr_model=asr_model_subword, path2manifest=manifest_file, return_hypotheses=True)
+        # Save transcription to a JSON file
+        with open(output_file_path, "w") as outfile:
+            json.dump(transcription_data, outfile)
 
-    print("Transcription: ", tr[0].text)
+    # # Transcribe audio using NeMo ASR
+    # tr = transcribe_partial_audio(
+    #     asr_model=asr_model_subword, path2manifest=manifest_file, return_hypotheses=True)
+
+    # print("Transcription: ", tr[0].text)
 
 
 if __name__ == "__main__":

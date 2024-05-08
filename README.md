@@ -34,11 +34,11 @@ For example, to build the Docker image with the user name `macarious`, use the f
 
 Run the Docker image on your local machine using the following command:
 
-`docker run [docker_user_name]/nemo_asr`
+`docker run -it [docker_user_name]/nemo_asr`
 
 For example, to run the Docker image with the user name `macarious`, use the following command:
 
-`docker run macarious/nemo_asr`
+`docker run -it macarious/nemo_asr`
 
 The following is the output of the Docker image:
 

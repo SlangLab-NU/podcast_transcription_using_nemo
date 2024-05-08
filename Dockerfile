@@ -10,6 +10,9 @@ RUN pip install numpy omegaconf scipy torch torchvision torchaudio Flask gunicor
 # Install Cython for NeMo
 RUN pip install Cython
 
+# Install Py-Spy for memory monitoring
+RUN pip install py-spy
+
 # Clone NeMo repository and install NeMo ASR
 ARG BRANCH=r1.13.0
 RUN pip install git+https://github.com/NVIDIA/NeMo.git@$BRANCH#egg=nemo_toolkit[asr]
@@ -20,22 +23,22 @@ RUN mkdir -p /nemo_asr_root/model && \
     unzip stt_en_conformer_ctc_xlarge_1.10.0.zip -d /nemo_asr_root/model && \
     rm stt_en_conformer_ctc_xlarge_1.10.0.zip
 
-# Create a output directory
+# Create output directory
 RUN mkdir -p /nemo_asr_root/output
 RUN mkdir -p /nemo_asr_root/sample
 
-# Set the working directory
+# Set working directory
 WORKDIR /nemo_asr_root
 
-# Copy your scripts and configuration files into the container
+# Copy scripts and configuration files into the container
 COPY run_transcribe.sh /nemo_asr_root/run_transcribe.sh
 COPY transcribe.py /nemo_asr_root/transcribe.py
 COPY run_check_output.sh /nemo_asr_root/run_check_output.sh
 COPY manifest.json /nemo_asr_root/manifest.json
 COPY sample/ac001_2006-09-10.wav /nemo_asr_root/sample/ac001_2006-09-10.wav
 
-# Expose the port the nemo_asr_root runs on
+# Expose port the nemo_asr_root runs on
 EXPOSE 5000
 
-# Define the command to run the nemo_asr_rootlication
-CMD ["bash", "run_transcribe.sh"]
+# Define the command to run; run run_transcribe.sh and then start a bash shell
+CMD ["bash", "-c", "./run_transcribe.sh; exec bash"]
