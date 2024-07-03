@@ -2,16 +2,10 @@
 FROM python:3.8
 
 # Install required system dependencies
-RUN apt-get update && apt-get install -y git sox ffmpeg wget unzip
+RUN apt-get update && apt-get install -y git sox libsndfile1 ffmpeg wget unzip
 
 # Install Python dependencies
-RUN pip install numpy omegaconf scipy torch torchvision torchaudio Flask gunicorn
-
-# Install Cython for NeMo
-RUN pip install Cython
-
-# Install Py-Spy for memory monitoring
-RUN pip install py-spy
+RUN pip install numpy omegaconf scipy torch torchvision torchaudio Flask gunicorn Cython py-spy unidecode matplotlib>=3.3.2
 
 # Clone NeMo repository and install NeMo ASR
 ARG BRANCH=r1.13.0
@@ -32,13 +26,14 @@ WORKDIR /nemo_asr_root
 
 # Copy scripts and configuration files into the container
 COPY run_transcribe.sh /nemo_asr_root/run_transcribe.sh
+COPY transcribe.cfg /nemo_asr_root/transcribe.cfg
+COPY ChunkBufferDecoder.py /nemo_asr_root/ChunkBufferDecoder.py
+COPY AudioBuffersDataLayer.py /nemo_asr_root/AudioBuffersDataLayer.py
+COPY AudioChunkIterator.py /nemo_asr_root/AudioChunkIterator.py
 COPY transcribe.py /nemo_asr_root/transcribe.py
-COPY run_check_output.sh /nemo_asr_root/run_check_output.sh
-COPY manifest.json /nemo_asr_root/manifest.json
-COPY sample/ac001_2006-09-10.wav /nemo_asr_root/sample/ac001_2006-09-10.wav
 
-# Expose port the nemo_asr_root runs on
-EXPOSE 5000
+# Make the run_transcribe.sh script executable
+RUN chmod +x /nemo_asr_root/run_transcribe.sh
+# Entrypoint to run the bash script
 
-# Define the command to run; run run_transcribe.sh and then start a bash shell
-CMD ["bash", "-c", "./run_transcribe.sh; exec bash"]
+ENTRYPOINT ["/nemo_asr_root/run_transcribe.sh"]
