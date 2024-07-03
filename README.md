@@ -96,5 +96,3 @@ If you encounter any issues, ensure that:
 For further assistance, refer to the Docker documentation: [Docker Documentation](https://docs.docker.com/)
 
 ---
-
-Feel free to add any additional instructions or information that might be helpful for users of your repository.
