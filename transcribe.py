@@ -1,43 +1,22 @@
-'''
-This script is used to transcribe audio files using the NeMo ASR model using buffer decoding.
-
-The script uses the following classes:
-    - ChunkBufferDecoder: A class to decode audio buffers using a sliding window approach.
-    - AudioChunkIterator: A simple iterator class to return successive chunks of samples.
-    - AudioBuffersDataLayer: A simple iterable dataset class to return a single buffer of samples.
-
-The script takes the following command line arguments:
-    - audio_path: Path to the audio file or directory containing audio files.
-    - output_dir: Directory to save the txt files with transcriptions.
-    - config_path: Path to the configuration file.
-    - asr_model_path: Path to the ASR model.
-    
-Example usage:
-    python transcribe.py <audio_path> <output_dir> <config_path> <asr_model_path>
-'''
-import os
-import argparse
-import configparser
-import logging
-import torch
-import contextlib
-import gc
-import soundfile as sf
-import scipy.signal
-import numpy as np
 import warnings
 import nemo.collections.asr as nemo_asr
-
-from AudioChunkIterator import AudioChunkIterator
 from ChunkBufferDecoder import ChunkBufferDecoder
+from AudioChunkIterator import AudioChunkIterator
+from typing import List, Tuple
+import numpy as np
+import scipy.signal
+import soundfile as sf
+import gc
+import torch
+import contextlib
+import configparser
+import argparse
+import logging
+import os
 
+warnings.filterwarnings("ignore", category=UserWarning,
+                        message="stft with return_complex=False is deprecated")
 logging.getLogger('nemo_logger').setLevel(logging.ERROR)
-logging.getLogger('nemo.core').setLevel(logging.ERROR)
-logging.getLogger('nemo.collections').setLevel(logging.ERROR)
-logging.getLogger('nemo.collections.asr').setLevel(logging.ERROR)
-logging.getLogger('nemo.utils').setLevel(logging.ERROR)
-logging.getLogger('nemo').setLevel(logging.ERROR)
-warnings.filterwarnings("ignore", message=".*Apex was not found.*")
 
 
 class AudioTranscriber:
@@ -82,7 +61,8 @@ class AudioTranscriber:
 
     def get_samples(self, audio_file: str, target_sr: int = 16000, chunk_size: int = 1024):
         """
-        Load audio file in chunks and resample if necessary
+        Load audio file in chunks and resample if necessary.
+        Returns samples for both left and right channels separately if stereo, or only left if mono.
         """
         with sf.SoundFile(audio_file, 'r') as f:
             sample_rate = f.samplerate
@@ -102,60 +82,80 @@ class AudioTranscriber:
 
         # Check if the audio is mono or multi-channel
         if samples.ndim == 2:  # Multi-channel (e.g., stereo)
-            samples = np.mean(samples, axis=1)  # Convert to mono by averaging
+            left_channel = samples[:, 0]
+            right_channel = samples[:, 1]
+        else:
+            left_channel = samples
+            right_channel = None  # Mono audio
 
-        return samples
+        return left_channel, right_channel
 
-    def transcribe_samples(self, samples: np.array):
+    def transcribe_samples(self, samples: Tuple[np.array, np.array]):
         """
-        Transcribe audio samples using the ASR model
+        Transcribe audio samples for both left and right channels using the ASR model.
         """
-        model = self.model
-        sample_rate = self.sample_rate
-        chunk_len_in_sec = self.chunk_len_in_sec
-        context_len_in_sec = self.context_len_in_sec
+        left_samples, right_samples = samples
+        transcriptions = []
+        channels = ['left', 'right']
 
-        # Buffer = context + chunk + context
-        buffer_len_in_sec = chunk_len_in_sec + 2 * context_len_in_sec
+        for channel, samples in zip(channels, [left_samples, right_samples]):
+            # Skip the right channel if it's the same as the left (mono audio)
+            if left_samples is not None and right_samples is not None and np.array_equal(left_samples, right_samples) and channel == 'right':
+                continue
 
-        n_buffers = int(
-            np.ceil(len(samples) / (sample_rate * chunk_len_in_sec)))
-        buffer_len = int(sample_rate * buffer_len_in_sec)
-        sampbuffer = np.zeros([buffer_len], dtype='float32')
+            model = self.model
+            sample_rate = self.sample_rate
+            chunk_len_in_sec = self.chunk_len_in_sec
+            context_len_in_sec = self.context_len_in_sec
 
-        # Initialize the decoder to transcribe audio buffers
-        chunk_reader = AudioChunkIterator(
-            samples, sample_rate, chunk_len_in_sec)
-        chunk_len = int(sample_rate * chunk_len_in_sec)
-        count = 0
-        buffer_list = []
-        for chunk in chunk_reader:
-            count += 1
-            chunk_len = len(chunk)
-            sampbuffer[:-chunk_len] = sampbuffer[chunk_len:]
-            sampbuffer[-chunk_len:] = chunk
+            # Buffer = context + chunk + context
+            buffer_len_in_sec = chunk_len_in_sec + 2 * context_len_in_sec
 
-            buffer_list.append(np.array(sampbuffer))
+            n_buffers = int(
+                np.ceil(len(samples) / (sample_rate * chunk_len_in_sec)))
+            buffer_len = int(sample_rate * buffer_len_in_sec)
+            sampbuffer = np.zeros([buffer_len], dtype='float32')
 
-            if count >= n_buffers:
-                break
+            # Initialize the decoder to transcribe audio buffers
+            chunk_reader = AudioChunkIterator(
+                samples, sample_rate, chunk_len_in_sec)
+            chunk_len = int(sample_rate * chunk_len_in_sec)
+            count = 0
+            buffer_list = []
+            buffer_offsets = []
+            for chunk in chunk_reader:
+                count += 1
+                chunk_len = len(chunk)
+                sampbuffer[:-chunk_len] = sampbuffer[chunk_len:]
+                sampbuffer[-chunk_len:] = chunk
 
-        stride = 4
+                buffer_list.append(np.array(sampbuffer))
+                # Offset by chunk length
+                buffer_offsets.append((count - 1) * chunk_len_in_sec)
 
-        gc.collect()
-        if self.device == 'cuda':
-            torch.cuda.empty_cache()
+                if count >= n_buffers:
+                    break
 
-        decoder = ChunkBufferDecoder(
-            model, stride, chunk_len_in_sec, buffer_len_in_sec)
+            stride = 4
 
-        transcription = decoder.transcribe_buffers(buffer_list, plot=False)
+            gc.collect()
+            if self.device == 'cuda':
+                torch.cuda.empty_cache()
 
-        return transcription
+            decoder = ChunkBufferDecoder(
+                model, stride, chunk_len_in_sec, buffer_len_in_sec)
 
-    def save_to_file(self, transcription: str, output_dir: str, audio_file: str):
+            for buffer, buffer_offset in zip(buffer_list, buffer_offsets):
+                transcription, timestamps = decoder.transcribe_buffers(
+                    [buffer], merge=False, buffer_offset=buffer_offset)
+                for t, ts in zip(transcription, timestamps):
+                    transcriptions.append((t, ts, channel))
+
+        return transcriptions
+
+    def save_to_file(self, transcriptions: List[Tuple[str, Tuple[float, float], str]], output_dir: str, audio_file: str):
         """
-        Save transcription to a text file
+        Save transcription to a text file.
         """
         # Check if output directory exists
         if not os.path.exists(output_dir):
@@ -164,14 +164,24 @@ class AudioTranscriber:
 
         file_name = os.path.basename(audio_file)
         file_name = os.path.splitext(file_name)[0]
-        output_file = os.path.join(output_dir, f"{file_name}.txt")
+        output_file = os.path.join(output_dir, f"{file_name}_output.txt")
+
+        # Sort transcriptions by start time
+        transcriptions.sort(key=lambda x: x[1][0])
 
         with open(output_file, "w") as f:
-            f.write(transcription)
+            for (transcript, timestamps, channel) in transcriptions:
+                start_time, end_time = timestamps
+                if start_time is None:
+                    start_time = 0.0
+                if end_time is None:
+                    end_time = 0.0
+                f.write(
+                    f"{transcript} {start_time:.2f} {end_time:.2f} {channel} 1.00\n")
 
     def transcribe_audio(self, audio_path: str, output_dir: str):
         """
-        Transcribe audio using the ASR model
+        Transcribe audio using the ASR model.
         """
         sample_rate = self.sample_rate
         audio_list = []
@@ -200,10 +210,10 @@ class AudioTranscriber:
             samples = self.get_samples(audio_file, sample_rate)
 
             print(index_message, "Transcribing audio...")
-            transcription = self.transcribe_samples(samples)
+            transcriptions = self.transcribe_samples(samples)
 
             print(index_message, "Saving transcription...")
-            self.save_to_file(transcription, output_dir, audio_file)
+            self.save_to_file(transcriptions, output_dir, audio_file)
 
             print(index_message, "Completed.")
 

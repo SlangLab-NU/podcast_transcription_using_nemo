@@ -34,6 +34,6 @@ COPY transcribe.py /nemo_asr_root/transcribe.py
 
 # Make the run_transcribe.sh script executable
 RUN chmod +x /nemo_asr_root/run_transcribe.sh
-# Entrypoint to run the bash script
 
+# Entrypoint to run the bash script
 ENTRYPOINT ["/nemo_asr_root/run_transcribe.sh"]

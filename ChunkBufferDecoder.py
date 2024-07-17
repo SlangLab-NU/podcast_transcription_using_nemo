@@ -1,7 +1,6 @@
 from torch.utils.data import DataLoader
 import math
 import torch
-import matplotlib.pyplot as plt
 
 from AudioBuffersDataLayer import AudioBuffersDataLayer
 
@@ -28,23 +27,18 @@ class ChunkBufferDecoder:
         self.n_tokens_per_chunk = math.ceil(
             self.chunk_len / self.model_stride_in_sec)
         self.blank_id = len(asr_model.decoder.vocabulary)
-        self.plot = False
 
     @torch.no_grad()
-    def transcribe_buffers(self, buffers, merge=True, plot=False):
-        self.plot = plot
+    def transcribe_buffers(self, buffers, merge=True, buffer_offset=0):
         self.buffers = buffers
         self.data_layer.set_signal(buffers[:])
         self._get_batch_preds()
-        return self.decode_final(merge)
+        return self.decode_final(merge, buffer_offset)
 
     def _get_batch_preds(self):
-
         device = self.asr_model.device
         for batch in iter(self.data_loader):
-
             audio_signal, audio_signal_len = batch
-
             audio_signal, audio_signal_len = audio_signal.to(
                 device), audio_signal_len.to(device)
             log_probs, encoded_len, predictions = self.asr_model(
@@ -53,60 +47,114 @@ class ChunkBufferDecoder:
             for pred in preds:
                 self.all_preds.append(pred.cpu().numpy())
 
-    def decode_final(self, merge=True, extra=0):
+    def decode_final(self, merge=True, buffer_offset=0):
         self.unmerged = []
         self.toks_unmerged = []
+        self.time_stamps = []
         # index for the first token corresponding to a chunk of audio would be len(decoded) - 1 - delay
         delay = math.ceil((self.chunk_len + (self.buffer_len -
                           self.chunk_len) / 2) / self.model_stride_in_sec)
 
         decoded_frames = []
         all_toks = []
+        all_times = []
         for pred in self.all_preds:
-            ids, toks = self._greedy_decoder(pred, self.asr_model.tokenizer)
+            ids, toks, times = self._greedy_decoder(
+                pred, self.asr_model.tokenizer)
             decoded_frames.append(ids)
             all_toks.append(toks)
+            all_times.append(times)
 
-        for decoded in decoded_frames:
-            self.unmerged += decoded[len(decoded) - 1 - delay:len(
-                decoded) - 1 - delay + self.n_tokens_per_chunk]
-        if self.plot:
-            for i, tok in enumerate(all_toks):
-                plt.plot(self.buffers[i])
-                plt.show()
-                print("\nGreedy labels collected from this buffer")
-                print(tok[len(tok) - 1 - delay:len(tok) -
-                      1 - delay + self.n_tokens_per_chunk])
-                self.toks_unmerged += tok[len(tok) - 1 - delay:len(
-                    tok) - 1 - delay + self.n_tokens_per_chunk]
-            print("\nTokens collected from successive buffers before CTC merge")
-            print(self.toks_unmerged)
+        for i, decoded in enumerate(decoded_frames):
+            start_index = len(decoded) - 1 - delay
+            end_index = start_index + self.n_tokens_per_chunk
+            self.unmerged += decoded[start_index:end_index]
+            adjusted_times = [t * self.model_stride_in_sec +
+                              buffer_offset for t in all_times[i][start_index:end_index]]
+            self.time_stamps += adjusted_times
+
+            # print(
+            #     f"Buffer {i}, Buffer offset: {buffer_offset}, Adjusted times: {adjusted_times}")
 
         if not merge:
-            return self.unmerged
-        return self.greedy_merge(self.unmerged)
+            text, time_stamps = self.combine_tokens_into_words(
+                self.unmerged, self.time_stamps)
+            return text, time_stamps
+
+        merged_text = self.greedy_merge(self.unmerged)
+        return merged_text, self.get_time_stamps(self.time_stamps)
 
     def _greedy_decoder(self, preds, tokenizer):
         s = []
         ids = []
+        times = []
         for i in range(preds.shape[0]):
             if preds[i] == self.blank_id:
                 s.append("_")
             else:
                 pred = preds[i]
                 s.append(tokenizer.ids_to_tokens([pred.item()])[0])
-            ids.append(preds[i])
-        return ids, s
+            ids.append(preds[i].item())
+            times.append(i)
+        return ids, s, times
 
     def greedy_merge(self, preds):
         decoded_prediction = []
         previous = self.blank_id
         for p in preds:
             if (p != previous or previous == self.blank_id) and p != self.blank_id:
-                decoded_prediction.append(p.item())
+                decoded_prediction.append(int(p))
             previous = p
         hypothesis = self.asr_model.tokenizer.ids_to_text(decoded_prediction)
         return hypothesis
+
+    def combine_tokens_into_words(self, ids, time_stamps):
+        words = []
+        start_times = []
+        end_times = []
+        current_word = []
+        current_start_time = None
+
+        tokens = self.convert_ids_to_text(ids)
+
+        for i, token in enumerate(tokens):
+            if token == "<UNK>":
+                continue  # Skip unknown tokens
+
+            if token.startswith("▁"):  # Using the special character for word boundary
+                if current_word:
+                    words.append("".join(current_word))
+                    start_times.append(current_start_time)
+                    end_times.append(time_stamps[i - 1])
+                current_word = [token[1:]]  # Remove leading special character
+                current_start_time = time_stamps[i]
+            else:
+                if current_start_time is None:
+                    current_start_time = time_stamps[i]
+                current_word.append(token)
+
+        if current_word:  # Append the last word if exists
+            words.append("".join(current_word))
+            start_times.append(current_start_time)
+            end_times.append(time_stamps[-1])
+
+        return words, list(zip(start_times, end_times))
+
+    def convert_ids_to_text(self, ids):
+        tokens = []
+        for id_ in ids:
+            try:
+                tokens.append(
+                    self.asr_model.tokenizer.ids_to_tokens([int(id_)])[0])
+            except KeyError:
+                # Handle special or unknown tokens
+                tokens.append('<UNK>')
+        return tokens
+
+    def get_time_stamps(self, time_stamps):
+        start_times = time_stamps
+        end_times = [t + self.model_stride_in_sec for t in start_times]
+        return list(zip(start_times, end_times))
 
 
 def speech_collate_fn(batch: list) -> tuple:
