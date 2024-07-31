@@ -153,8 +153,7 @@ class AudioTranscriber:
                         transcriptions.append((t, ts, channel))
             except Exception as e:
                 print(f"An error occurred: {e}")
-        import json
-        trans_json = json.dumps(transcriptions)
+
         return transcriptions
 
     def save_to_file(self, transcriptions: List[Tuple[str, Tuple[float, float], str]], output_dir: str, audio_file: str):
@@ -187,9 +186,6 @@ class AudioTranscriber:
         sample_rate = self.sample_rate
         samples = self.get_samples(audio_file, sample_rate)
         transcriptions = self.transcribe_samples(samples)
-        #from flask import jsonify
-        import json
-        trans_json = json.dumps(transcriptions)
         return transcriptions
 
     def transcribe_audio(self, audio_path: str, output_dir: str):

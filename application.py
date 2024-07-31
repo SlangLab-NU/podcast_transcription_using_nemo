@@ -3,6 +3,7 @@ from flask_cors import CORS
 import base64
 from transcribe import AudioTranscriber
 import os
+import json
 
 
 def create_transcriber():
@@ -13,7 +14,13 @@ def create_transcriber():
     return transcriber
 
 
-app = Flask(__name__)
+def create_app():
+    app_obj = Flask(__name__)
+    # app_obj = CORS(app_obj)
+    return app_obj
+
+
+app = create_app()
 transciber = create_transcriber()
 
 @app.route("/")
@@ -22,7 +29,16 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    audio_file = '/Users/aanchan/work/podcast_transcription_using_nemo/test/input.wav'
-    transcription = transciber.transcribe_api(audio_file)
+    json_data = request.get_json()
+    audio_encoded = json_data['audio']['content']
+    sample_rate = json_data['config']['sample_rate']
+    wav_data = base64.b64decode(audio_encoded)
+    output_audio_file = os.path.join(os.getcwd(), 'output.wav')
+    with open(output_audio_file, 'wb') as wav_file:
+        wav_file.write(wav_data)
+    transcription = transciber.transcribe_api(output_audio_file, sample_rate)
     return jsonify(transcription)
 
+
+if __name__ == '__main__':
+    app.run()

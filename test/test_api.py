@@ -1,12 +1,12 @@
 import pytest
 from application import app
 from application import create_transcriber
-import base64, soundfile as sf
+import base64, json
 import os
 
 
 @pytest.fixture(scope="module")
-def create_audio_buffer():
+def audio_buffer():
     cwd = os.getcwd()
     input_audio_file = os.path.join(cwd, 'input.wav')
     output_audio_file = os.path.join(cwd, 'output.wav')
@@ -18,18 +18,38 @@ def create_audio_buffer():
     #with open(output_audio_file, 'wb') as wav_file:
     #    wav_file.write(wav_data)
     #assert os.path.isfile(output_audio_file)
+
+
+@pytest.fixture(scope="module")
+def request_data(audio_buffer):
+    request_dict = {
+        'config': {
+          'sample_rate': 16000
+        },
+        'audio': {
+            'content': audio_buffer
+        }
+    }
+    yield request_dict
+
+
 def test_load_transcriber():
     transcriber = create_transcriber()
     assert transcriber is not None
 
-def test_predict_route():
-    client = app.test_client()
-    response = client.post('/predict')
+@pytest.fixture(scope="module")
+def testing_client():
+    yield app.test_client()
+
+
+def test_predict_route(testing_client, request_data):
+    response = testing_client.post('/predict', json=request_data)
     print(response.get_data(as_text=True))
     assert response
-def test_index_route():
-    client = app.test_client()
-    response = client.get('/')
+
+
+def test_index_route(testing_client):
+    response = testing_client.get('/')
     print(response.data.decode('utf-8'))
     assert response.status_code == 200
     assert response.data.decode('utf-8') == 'Testing, Flask!'
