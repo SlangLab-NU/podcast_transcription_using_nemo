@@ -5,11 +5,13 @@ FROM python:3.8
 RUN apt-get update && apt-get install -y git sox libsndfile1 ffmpeg wget unzip
 
 # Install Python dependencies
-RUN pip install numpy omegaconf scipy torch torchvision torchaudio Flask gunicorn Cython py-spy unidecode matplotlib>=3.3.2
+RUN pip install numpy flask-cors omegaconf pytest scipy torch torchvision torchaudio Flask gunicorn unidecode
 
 # Clone NeMo repository and install NeMo ASR
 ARG BRANCH=r1.13.0
 RUN pip install git+https://github.com/NVIDIA/NeMo.git@$BRANCH#egg=nemo_toolkit[asr]
+RUN pip install huggingface_hub==0.22.0
+
 
 # Download and unzip the ASR model
 RUN mkdir -p /nemo_asr_root/model && \
