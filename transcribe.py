@@ -88,6 +88,10 @@ class AudioTranscriber:
             left_channel = samples
             right_channel = None  # Mono audio
 
+        # If both channels are the same, return only one channel
+        if np.array_equal(left_channel, right_channel):
+            right_channel = None
+
         return left_channel, right_channel
 
     def transcribe_samples(self, samples: Tuple[np.array, np.array]):
@@ -123,14 +127,13 @@ class AudioTranscriber:
             count = 0
             buffer_list = []
             buffer_offsets = []
+
             for chunk in chunk_reader:
                 count += 1
                 chunk_len = len(chunk)
-                sampbuffer[:-chunk_len] = sampbuffer[chunk_len:]
+                sampbuffer = np.zeros([buffer_len], dtype='float32')
                 sampbuffer[-chunk_len:] = chunk
-
-                buffer_list.append(np.array(sampbuffer))
-                # Offset by chunk length
+                buffer_list.append(sampbuffer.copy())
                 buffer_offsets.append((count - 1) * chunk_len_in_sec)
 
                 if count >= n_buffers:
@@ -145,11 +148,22 @@ class AudioTranscriber:
             decoder = ChunkBufferDecoder(
                 model, stride, chunk_len_in_sec, buffer_len_in_sec)
 
+            buffer_count = len(buffer_list)
+            count = 0
+
             for buffer, buffer_offset in zip(buffer_list, buffer_offsets):
+                print(
+                    f"Transcribing buffer {count + 1}/{buffer_count} ({channel})")
                 transcription, timestamps = decoder.transcribe_buffers(
-                    [buffer], merge=False, buffer_offset=buffer_offset)
+                    [buffer], merge=False)
+
+                offset = buffer_offset - context_len_in_sec * 2
+
                 for t, ts in zip(transcription, timestamps):
+                    ts = (ts[0] + offset, ts[1] + offset)
                     transcriptions.append((t, ts, channel))
+                    
+                count += 1
 
         return transcriptions
 
