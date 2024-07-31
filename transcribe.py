@@ -103,54 +103,58 @@ class AudioTranscriber:
             if left_samples is not None and right_samples is not None and np.array_equal(left_samples, right_samples) and channel == 'right':
                 continue
 
-            model = self.model
-            sample_rate = self.sample_rate
-            chunk_len_in_sec = self.chunk_len_in_sec
-            context_len_in_sec = self.context_len_in_sec
+            try:
+                model = self.model
+                sample_rate = self.sample_rate
+                chunk_len_in_sec = self.chunk_len_in_sec
+                context_len_in_sec = self.context_len_in_sec
 
-            # Buffer = context + chunk + context
-            buffer_len_in_sec = chunk_len_in_sec + 2 * context_len_in_sec
+                # Buffer = context + chunk + context
+                buffer_len_in_sec = chunk_len_in_sec + 2 * context_len_in_sec
 
-            n_buffers = int(
-                np.ceil(len(samples) / (sample_rate * chunk_len_in_sec)))
-            buffer_len = int(sample_rate * buffer_len_in_sec)
-            sampbuffer = np.zeros([buffer_len], dtype='float32')
+                n_buffers = int(
+                    np.ceil(len(samples) / (sample_rate * chunk_len_in_sec)))
+                buffer_len = int(sample_rate * buffer_len_in_sec)
+                sampbuffer = np.zeros([buffer_len], dtype='float32')
 
-            # Initialize the decoder to transcribe audio buffers
-            chunk_reader = AudioChunkIterator(
-                samples, sample_rate, chunk_len_in_sec)
-            chunk_len = int(sample_rate * chunk_len_in_sec)
-            count = 0
-            buffer_list = []
-            buffer_offsets = []
-            for chunk in chunk_reader:
-                count += 1
-                chunk_len = len(chunk)
-                sampbuffer[:-chunk_len] = sampbuffer[chunk_len:]
-                sampbuffer[-chunk_len:] = chunk
+                # Initialize the decoder to transcribe audio buffers
+                chunk_reader = AudioChunkIterator(
+                    samples, sample_rate, chunk_len_in_sec)
+                chunk_len = int(sample_rate * chunk_len_in_sec)
+                count = 0
+                buffer_list = []
+                buffer_offsets = []
+                for chunk in chunk_reader:
+                    count += 1
+                    chunk_len = len(chunk)
+                    sampbuffer[:-chunk_len] = sampbuffer[chunk_len:]
+                    sampbuffer[-chunk_len:] = chunk
 
-                buffer_list.append(np.array(sampbuffer))
-                # Offset by chunk length
-                buffer_offsets.append((count - 1) * chunk_len_in_sec)
+                    buffer_list.append(np.array(sampbuffer))
+                    # Offset by chunk length
+                    buffer_offsets.append((count - 1) * chunk_len_in_sec)
 
-                if count >= n_buffers:
-                    break
+                    if count >= n_buffers:
+                        break
 
-            stride = 4
+                stride = 4
 
-            gc.collect()
-            if self.device == 'cuda':
-                torch.cuda.empty_cache()
+                gc.collect()
+                if self.device == 'cuda':
+                    torch.cuda.empty_cache()
 
-            decoder = ChunkBufferDecoder(
-                model, stride, chunk_len_in_sec, buffer_len_in_sec)
+                decoder = ChunkBufferDecoder(
+                    model, stride, chunk_len_in_sec, buffer_len_in_sec)
 
-            for buffer, buffer_offset in zip(buffer_list, buffer_offsets):
-                transcription, timestamps = decoder.transcribe_buffers(
-                    [buffer], merge=False, buffer_offset=buffer_offset)
-                for t, ts in zip(transcription, timestamps):
-                    transcriptions.append((t, ts, channel))
-
+                for buffer, buffer_offset in zip(buffer_list, buffer_offsets):
+                    transcription, timestamps = decoder.transcribe_buffers(
+                        [buffer], merge=False, buffer_offset=buffer_offset)
+                    for t, ts in zip(transcription, timestamps):
+                        transcriptions.append((t, ts, channel))
+            except Exception as e:
+                print(f"An error occurred: {e}")
+        import json
+        trans_json = json.dumps(transcriptions)
         return transcriptions
 
     def save_to_file(self, transcriptions: List[Tuple[str, Tuple[float, float], str]], output_dir: str, audio_file: str):
@@ -178,6 +182,15 @@ class AudioTranscriber:
                     end_time = 0.0
                 f.write(
                     f"{transcript} {start_time:.2f} {end_time:.2f} {channel} 1.00\n")
+
+    def transcribe_api(self, audio_file, sample_rate=16000):
+        sample_rate = self.sample_rate
+        samples = self.get_samples(audio_file, sample_rate)
+        transcriptions = self.transcribe_samples(samples)
+        #from flask import jsonify
+        import json
+        trans_json = json.dumps(transcriptions)
+        return transcriptions
 
     def transcribe_audio(self, audio_path: str, output_dir: str):
         """
