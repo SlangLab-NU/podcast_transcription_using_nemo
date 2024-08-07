@@ -8,6 +8,7 @@ Link to the NeMo model: [NVIDIA NeMo](https://github.com/NVIDIA/NeMo)
 
 ## Files Included in the Repository
 
+- `Dockerfile-api`: Instructions to build the Docker image to run the code as an API.
 - `Dockerfile`: Instructions to build the Docker image.
 - `run_transcribe.sh`: Bash script to run the transcription on all the files in the input directory.
 - `transcribe.py`: Python script to transcribe the audio files using the NeMo model.
@@ -16,7 +17,7 @@ Link to the NeMo model: [NVIDIA NeMo](https://github.com/NVIDIA/NeMo)
 - `AudioChunkIterator.py`: Iterates over the audio chunks.
 - `ChunkBufferDecoder.py`: Decodes the buffered chunks.
 
-## 1. Pulling the Docker Image
+## 1. Pulling the Docker Image (for running file based transcription using the Dockerfile)
 
 To pull the Docker image from Docker Hub, use the following command:
 
@@ -24,7 +25,7 @@ To pull the Docker image from Docker Hub, use the following command:
 docker pull macarious/nemo_asr:latest
 ```
 
-## 2. Running Docker
+## 2. Running Docker (for running file based transcription using the Dockerfile)
 
 Run the Docker image on your local machine using the following command:
 
@@ -77,6 +78,54 @@ For example, if your Docker Hub username is `macarious`, you would run the follo
 docker tag nemo_asr macarious/nemo_asr
 docker push macarious/nemo_asr
 ```
+
+## 3. Running the API using Dockerfile-api 
+
+Build the Docker image locally like so:
+```
+docker build -f Dockerfile-api -t flask-gunicorn-app .
+```
+
+Run the Docker container to start up the API, this will be available at `http://localhost:8000` :
+```
+docker run -p 8000:8000 flask-gunicorn-app
+```
+
+Once the container is up and running, to verify that it is running navigate to `http://localhost:8000` in your browser window where you should see the default route displaying, "Testing Flask!"
+
+<img width="278" alt="Screen Shot 2024-08-07 at 10 16 36 AM" src="https://github.com/user-attachments/assets/0a098f7f-b461-4159-99b2-5c518e76480a">
+
+To test the API with Postman, first encode an audio file like so to turn it into a base64 string (inspired by the [Google speech-to-text API](https://cloud.google.com/speech-to-text/docs/base64-encoding)):
+```
+# Import the base64 encoding library.
+import base64
+
+# Pass the audio data to an encoding function.
+input_audio_file = os.path.join(cwd, 'input.wav')
+with open(input_audio_file, 'rb') as wav_file:
+  wav_data = wav_file.read()
+  base64_encoded = base64.b64encode(wav_data).decode('utf-8')
+```
+
+Use the base64_encoded string to compose a JSON object like so:
+
+```
+{
+  "config": {
+    "sample_rate": 16000,
+  },
+  "audio": {
+    "content": "ZkxhQwAAACIQABAAAAUJABtAA+gA8AB+W8FZndQvQAyjv..."
+  }
+}
+
+```
+Right now (as of Aug 7, 2024) `sample_rate` does not do much. It assumes that the string can be converted to raw bytes which contains a WAV header. There is internal resampling on a per-chunk basis, but this needs to be tested with varying sampling rates input via the API. 
+
+Once composed use Postman to hit the `/predict` endpoint for the container running locally by setting the Body parameter to `raw` and `JSON` like the screenshot below:
+![Screen Shot 2024-08-07 at 10 25 57 AM](https://github.com/user-attachments/assets/031cd2b2-e367-4853-9f66-0922b1915fbe)
+
+You should receive a `200 OK` response back with the transcription.
 
 ---
 
