@@ -105,6 +105,10 @@ class AudioTranscriber:
             left_channel = samples
             right_channel = None  # Mono audio
 
+        # If both channels are the same, return only one channel
+        if np.array_equal(left_channel, right_channel):
+            right_channel = None
+
         return left_channel, right_channel
 
     def transcribe_samples(self, samples: Tuple[np.array, np.array]):
@@ -170,7 +174,7 @@ class AudioTranscriber:
                         transcriptions.append((t, ts, channel))
             except Exception as e:
                 print(f"An error occurred: {e}")
-
+                
         return transcriptions
 
     def save_to_file(self, transcriptions: List[Tuple[str, Tuple[float, float], str]], output_dir: str, audio_file: str):
