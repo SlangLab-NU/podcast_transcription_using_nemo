@@ -8,16 +8,33 @@ import scipy.signal
 import soundfile as sf
 import gc
 import torch
-import contextlib
+from contextlib import contextmanager
 import configparser
 import argparse
 import logging
 import os
-
+from io import BytesIO
+from typing import Union
 warnings.filterwarnings("ignore", category=UserWarning,
                         message="stft with return_complex=False is deprecated")
 logging.getLogger('nemo_logger').setLevel(logging.ERROR)
 
+@contextmanager
+def open_audio(input_data: Union[str, bytes]):
+    if isinstance(input_data, str):
+        # input_data is a file path
+        audio_file = sf.SoundFile(input_data, 'r')
+    elif isinstance(input_data, bytes):
+        # input_data is bytes data
+        audio_buffer = BytesIO(input_data)
+        audio_file = sf.SoundFile(audio_buffer, 'rb')
+    else:
+        raise ValueError("input_data must be a file path (str) or bytes data")
+
+    try:
+        yield audio_file
+    finally:
+        audio_file.close()
 
 class AudioTranscriber:
     def __init__(self, asr_model_path, config_path, device='cpu'):
@@ -59,12 +76,12 @@ class AudioTranscriber:
         self.chunk_len_in_sec = int(transcribe_config.get('chunk_len', 30))
         self.context_len_in_sec = int(transcribe_config.get('context_len', 5))
 
-    def get_samples(self, audio_file: str, target_sr: int = 16000, chunk_size: int = 1024):
+    def get_samples(self, input_data: Union[str, bytes], target_sr: int = 16000, chunk_size: int = 1024):
         """
         Load audio file in chunks and resample if necessary.
         Returns samples for both left and right channels separately if stereo, or only left if mono.
         """
-        with sf.SoundFile(audio_file, 'r') as f:
+        with open_audio(input_data) as f:
             sample_rate = f.samplerate
             num_frames = f.frames
             data = []
@@ -182,9 +199,9 @@ class AudioTranscriber:
                 f.write(
                     f"{transcript} {start_time:.2f} {end_time:.2f} {channel} 1.00\n")
 
-    def transcribe_api(self, audio_file, sample_rate=16000):
+    def transcribe_api(self, input_data: Union[str, bytes], sample_rate=16000):
         sample_rate = self.sample_rate
-        samples = self.get_samples(audio_file, sample_rate)
+        samples = self.get_samples(input_data, sample_rate)
         transcriptions = self.transcribe_samples(samples)
         return transcriptions
 

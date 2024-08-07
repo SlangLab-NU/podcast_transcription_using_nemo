@@ -2,22 +2,19 @@ import pytest
 from application import app
 from application import create_transcriber
 import base64, json
-import os
-
+import os, io
+import soundfile as sf
 
 @pytest.fixture(scope="module")
 def audio_buffer():
     cwd = os.getcwd()
     input_audio_file = os.path.join(cwd, 'input.wav')
-    output_audio_file = os.path.join(cwd, 'output.wav')
     with open(input_audio_file, 'rb') as wav_file:
         wav_data = wav_file.read()
     base64_encoded = base64.b64encode(wav_data).decode('utf-8')
-    yield base64_encoded
     #wav_data = base64.b64decode(base64_encoded)
-    #with open(output_audio_file, 'wb') as wav_file:
-    #    wav_file.write(wav_data)
-    #assert os.path.isfile(output_audio_file)
+    #waveform, samplerate = sf.read(io.BytesIO(wav_data))
+    yield base64_encoded
 
 
 @pytest.fixture(scope="module")
@@ -43,6 +40,7 @@ def testing_client():
 
 
 def test_predict_route(testing_client, request_data):
+    request_json = json.dumps(request_data)
     response = testing_client.post('/predict', json=request_data)
     print(response.get_data(as_text=True))
     assert response

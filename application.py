@@ -33,10 +33,7 @@ def predict():
     audio_encoded = json_data['audio']['content']
     sample_rate = json_data['config']['sample_rate']
     wav_data = base64.b64decode(audio_encoded)
-    output_audio_file = os.path.join(os.getcwd(), 'output.wav')
-    with open(output_audio_file, 'wb') as wav_file:
-        wav_file.write(wav_data)
-    transcription = transciber.transcribe_api(output_audio_file, sample_rate)
+    transcription = transciber.transcribe_api(wav_data, sample_rate)
     return jsonify(transcription)
 
 
