@@ -1,6 +1,7 @@
 from torch.utils.data import DataLoader
 import math
 import torch
+from typing import List, Tuple
 
 from AudioBuffersDataLayer import AudioBuffersDataLayer
 
@@ -8,9 +9,37 @@ from AudioBuffersDataLayer import AudioBuffersDataLayer
 class ChunkBufferDecoder:
     """
     A class to decode audio buffers using a sliding window approach.
+
+    Attributes:
+        asr_model (nemo.collections.asr.models.EncDecCTCModel): The ASR model to use for decoding.
+        stride (int): The stride to use for the sliding window approach.
+        chunk_len_in_sec (int): The length of each chunk in seconds.
+        buffer_len_in_sec (int): The length of the buffer in seconds.
+        model_stride_in_sec (int): The stride of the ASR model in seconds.
+        n_tokens_per_chunk (int): The number of tokens per chunk.
+        blank_id (int): The id of the blank token.
+
+    Methods:
+        transcribe_buffers: Transcribe the given buffers.
+        _get_batch_preds: Get the predictions from the model.
+        decode_final: Decode the final predictions.
+        _greedy_decoder: Decode the predictions using a greedy approach.
+        greedy_merge: Merge the predictions using a greedy approach.
+        combine_tokens_into_words: Combine the tokens into words.
+        convert_ids_to_text: Convert the ids to text.
+        get_time_stamps: Get the time stamps.
     """
 
-    def __init__(self, asr_model, stride, chunk_len_in_sec=1, buffer_len_in_sec=3):
+    def __init__(self, asr_model: torch.nn.Module, chunk_len_in_sec: int, buffer_len_in_sec: int, stride: int) -> None:
+        """
+        Initialize the ChunkBufferDecoder.
+
+        Args:
+            asr_model (nemo.collections.asr.models.EncDecCTCModel): The ASR model to use for decoding.
+            chunk_len_in_sec (int): The length of each chunk in seconds.
+            buffer_len_in_sec (int): The length of the buffer in seconds.
+            stride (int): The stride to use for the sliding window approach.
+        """
         self.asr_model = asr_model
         self.asr_model.eval()
         self.data_layer = AudioBuffersDataLayer()
@@ -29,13 +58,34 @@ class ChunkBufferDecoder:
         self.blank_id = len(asr_model.decoder.vocabulary)
 
     @torch.no_grad()
-    def transcribe_buffers(self, buffers, merge=True, buffer_offset=0):
+    def transcribe_buffers(self, buffers: List[torch.Tensor], merge=True, buffer_offset=0) -> Tuple[List[str], List[Tuple[float, float]]]:
+        """
+        Transcribe the given buffers. If merge is True, the predictions will be merged.
+
+        Args:
+            buffers (List[torch.Tensor]): The audio buffers to transcribe.
+            merge (bool): Whether to merge the predictions.
+            buffer_offset (int): The offset to use for the buffer.
+
+        Returns:
+            List[str]: The transcription.
+            List[Tuple[float, float]]: The time stamps.
+        """
         self.buffers = buffers
         self.data_layer.set_signal(buffers[:])
         self._get_batch_preds()
         return self.decode_final(merge, buffer_offset)
 
-    def _get_batch_preds(self):
+    def _get_batch_preds(self) -> None:
+        """
+        Get the predictions from the model.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         device = self.asr_model.device
         for batch in iter(self.data_loader):
             audio_signal, audio_signal_len = batch
@@ -47,7 +97,18 @@ class ChunkBufferDecoder:
             for pred in preds:
                 self.all_preds.append(pred.cpu().numpy())
 
-    def decode_final(self, merge=True, buffer_offset=0):
+    def decode_final(self, merge: bool, buffer_offset: int) -> Tuple[List[str], List[Tuple[float, float]]]:
+        """
+        Decode the final predictions.
+
+        Args:
+            merge (bool): Whether to merge the predictions.
+            buffer_offset (int): The offset to use for the buffer.
+
+        Returns:
+            List[str]: The transcription.
+            List[Tuple[float, float]]: The time stamps.
+        """
         self.unmerged = []
         self.toks_unmerged = []
         self.time_stamps = []
@@ -84,7 +145,19 @@ class ChunkBufferDecoder:
         merged_text = self.greedy_merge(self.unmerged)
         return merged_text, self.get_time_stamps(self.time_stamps)
 
-    def _greedy_decoder(self, preds, tokenizer):
+    def _greedy_decoder(self, preds: torch.Tensor, tokenizer) -> Tuple[List[int], List[str], List[int]]:
+        """
+        Decode the predictions using a greedy approach.
+
+        Args:
+            preds (torch.Tensor): The predictions.
+            tokenizer (nemo.collections.asr.data.audio_to_text.AudioToCharProcessor): The tokenizer.
+
+        Returns:
+            List[int]: The ids.
+            List[str]: The tokens.
+            List[int]: The time stamps.
+        """
         s = []
         ids = []
         times = []
@@ -98,7 +171,16 @@ class ChunkBufferDecoder:
             times.append(i)
         return ids, s, times
 
-    def greedy_merge(self, preds):
+    def greedy_merge(self, preds: List[int]) -> str:
+        """
+        Merge the predictions using a greedy approach.
+
+        Args:
+            preds (List[int]): The predictions.
+
+        Returns:
+            str: The merged predictions.
+        """
         decoded_prediction = []
         previous = self.blank_id
         for p in preds:
@@ -108,7 +190,18 @@ class ChunkBufferDecoder:
         hypothesis = self.asr_model.tokenizer.ids_to_text(decoded_prediction)
         return hypothesis
 
-    def combine_tokens_into_words(self, ids, time_stamps):
+    def combine_tokens_into_words(self, ids: List[int], time_stamps: List[int]) -> Tuple[List[str], List[Tuple[float, float]]]:
+        """
+        Combine the tokens into words.
+
+        Args:
+            ids (List[int]): The ids.
+            time_stamps (List[int]): The time stamps.
+
+        Returns:
+            List[str]: The words.
+            List[Tuple[float, float]]: The time stamps.
+        """
         words = []
         start_times = []
         end_times = []
@@ -140,7 +233,16 @@ class ChunkBufferDecoder:
 
         return words, list(zip(start_times, end_times))
 
-    def convert_ids_to_text(self, ids):
+    def convert_ids_to_text(self, ids: List[int]) -> List[str]:
+        """
+        Convert a list of token ids to text.
+
+        Args:
+            ids(list): A list of token ids.
+
+        Returns:
+            List[str]: A list of tokens.
+        """
         tokens = []
         for id_ in ids:
             try:
@@ -151,22 +253,32 @@ class ChunkBufferDecoder:
                 tokens.append('<UNK>')
         return tokens
 
-    def get_time_stamps(self, time_stamps):
+    def get_time_stamps(self, time_stamps: List[int]) -> List[Tuple[float, float]]:
+        """
+        Get the time stamps.
+
+        Args:
+            time_stamps (List[int]): The time stamps.
+
+        Returns:
+            List[Tuple[float, float]]: The time stamps.
+        """
         start_times = time_stamps
         end_times = [t + self.model_stride_in_sec for t in start_times]
         return list(zip(start_times, end_times))
 
 
-def speech_collate_fn(batch: list) -> tuple:
+def speech_collate_fn(batch: list) -> Tuple[torch.Tensor, torch.Tensor]:
     """
     Collate batch of audio signals into a single tensor with their lengths.
 
     Args:
-        batch (FloatTensor, LongTensor):  A tuple of tuples of signal, signal lengths.
-        This collate func assumes the signals are 1d torch tensors (i.e. mono audio).
+        batch(FloatTensor, LongTensor):  A tuple of tuples of signal, signal lengths.
+        This collate func assumes the signals are 1d torch tensors(i.e. mono audio).
 
     Returns:
-        (FloatTensor, LongTensor): A tuple containing the signals stacked as a tensor and the lengths.
+        FloatTensor: A tensor of audio signals.
+        LongTensor: A tensor of audio signal lengths.
     """
 
     _, audio_lengths = zip(*batch)

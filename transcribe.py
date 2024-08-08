@@ -48,7 +48,18 @@ def open_audio(input_data: Union[str, bytes]) -> sf.SoundFile:
 
 
 class AudioTranscriber:
-    def __init__(self, asr_model_path, config_path, device='cpu'):
+    def __init__(self, asr_model_path: str, config_path: str, device: str = 'cpu'):
+        """
+        Initialize the AudioTranscriber object with the ASR model and configuration.
+
+        Args:
+            asr_model_path (str): Path to the ASR model.
+            config_path (str): Path to the configuration file.
+            device (str): Device to use for inference. Default is 'cpu'.
+
+        Returns:
+            None
+        """
         self.model_path = asr_model_path
         self.config = config_path
         self.init_config()
@@ -92,17 +103,17 @@ class AudioTranscriber:
         self.chunk_len_in_sec = int(transcribe_config.get('chunk_len', 30))
         self.context_len_in_sec = int(transcribe_config.get('context_len', 5))
 
-    def compare_channels(self, left_samples: np.array, right_samples: np.array, tolerance: float = 1e-4):
+    def compare_channels(self, left_samples: np.array, right_samples: np.array, tolerance: float = 1e-4) -> bool:
         """
         Compare left and right audio channels to check if they are the same.
 
         Args:
-            left_samples: Left audio samples.
-            right_samples: Right audio samples.
-            tolerance: Tolerance level for comparing the two channels. Default is 1e-5.
+            left_samples (np.array): Left audio samples.
+            right_samples (np.array): Right audio samples.
+            tolerance (float): Tolerance level for comparing the two channels. Default is 1e-4.
 
         Returns:
-            True if the two channels are the same within the tolerance level, False otherwise.
+            Boolean value indicating if the two channels are the same within the tolerance level.
         """
         if left_samples is None or right_samples is None:
             return False
@@ -152,12 +163,12 @@ class AudioTranscriber:
 
         return left_channel, right_channel
 
-    def transcribe_samples(self, samples: Tuple[np.array, np.array]):
+    def transcribe_samples(self, samples: Tuple[np.array, np.array]) -> List[Tuple[str, Tuple[float, float], str]]:
         """
         Transcribe audio samples using the ASR model. If the audio is mono, only the left channel is transcribed.
 
         Args:
-            samples: Tuple of left and right audio samples. If the audio is mono, right channel is None.
+            samples [Tuple[np.array, np.array]]: Tuple of left and right audio samples.
 
         Returns:
             List of transcriptions with timestamps and channel information.
@@ -206,6 +217,7 @@ class AudioTranscriber:
                     if count >= n_buffers:
                         break
 
+                # Keep below (chunk_len / 6); smaller the value the better the resolution
                 stride = 4
 
                 gc.collect()
@@ -227,12 +239,12 @@ class AudioTranscriber:
 
     def save_to_file(self, transcriptions: List[Tuple[str, Tuple[float, float], str]], output_dir: str, audio_file: str):
         """
-        Save transcription to a text file.
+        Save transcription to a text file. The text file will contain the transcriptions with timestamps and channel information.
 
         Args:
-            transcriptions: List of transcriptions with timestamps and channel information.
-            output_dir: Directory to save the output text file.
-            audio_file: Path to the audio
+            transcriptions (List[Tuple[str, Tuple[float, float], str]]): List of transcriptions with timestamps and channel information.
+            output_dir (str): Directory to save the output text files.
+            audio_file (str): Path to the audio file.
 
         Returns:
             None
@@ -264,8 +276,8 @@ class AudioTranscriber:
         Transcribe audio using the ASR model.
 
         Args:
-            input_data: Path to the audio file or bytes data of the audio file.
-            sample_rate: Sample rate of the audio. Default is 16000.
+            input_data (Union[str, bytes]): Path to the audio file or bytes data of the audio file.
+            sample_rate (int): Sample rate of the audio file. Default is 16000.
 
         Returns:
             List of transcriptions with timestamps and channel information.
@@ -277,11 +289,11 @@ class AudioTranscriber:
 
     def transcribe_audio(self, audio_path: str, output_dir: str):
         """
-        Transcribe audio using the ASR model.
+        Transcribe audio using the ASR model. The audio can be a single file or a directory containing multiple audio files.
 
         Args:
-            audio_path: Path to the audio file or directory containing audio files.
-            output_dir: Directory to save the output text files.
+            audio_path (str): Path to the audio file or directory containing audio files.
+            output_dir (str): Directory to save the output text files.
 
         Returns:
             None
