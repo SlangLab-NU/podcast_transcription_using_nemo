@@ -9,7 +9,8 @@ import json
 def create_transcriber():
     cwd = os.getcwd()
     CONFIG_PATH = os.path.join(cwd, 'transcribe.cfg')
-    ASR_MODEL_PATH = os.path.join(cwd, "model/stt_en_conformer_ctc_xlarge.nemo")
+    ASR_MODEL_PATH = os.path.join(
+        cwd, "model/stt_en_conformer_ctc_xlarge.nemo")
     transcriber = AudioTranscriber(ASR_MODEL_PATH, CONFIG_PATH)
     return transcriber
 
@@ -23,9 +24,12 @@ def create_app():
 app = create_app()
 transciber = create_transcriber()
 
+
 @app.route("/")
 def index():
+    print("Request received -- Testing, Flask!")
     return "Testing, Flask!"
+
 
 @app.route('/predict', methods=['POST'])
 def predict():

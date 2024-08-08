@@ -112,7 +112,7 @@ Use the base64_encoded string to compose a JSON object like so:
 ```
 {
   "config": {
-    "sample_rate": 16000,
+    "sample_rate": 16000
   },
   "audio": {
     "content": "ZkxhQwAAACIQABAAAAUJABtAA+gA8AB+W8FZndQvQAyjv..."
