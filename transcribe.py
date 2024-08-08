@@ -106,9 +106,8 @@ class AudioTranscriber:
         """
         if left_samples is None or right_samples is None:
             return False
-        
+
         mean_absolute_diff = np.mean(np.abs(left_samples - right_samples))
-        print(f"Mean absolute difference between left and right channels: {mean_absolute_diff}")
         return mean_absolute_diff < tolerance
 
     def get_samples(self, input_data: Union[str, bytes], target_sr: int = 16000, chunk_size: int = 1024):
@@ -201,7 +200,8 @@ class AudioTranscriber:
 
                     buffer_list.append(np.array(sampbuffer))
                     # Offset by chunk length
-                    buffer_offsets.append((count - 1) * chunk_len_in_sec)
+                    buffer_offsets.append(
+                        (count - 1) * chunk_len_in_sec - 2 * context_len_in_sec)
 
                     if count >= n_buffers:
                         break
