@@ -19,8 +19,18 @@ warnings.filterwarnings("ignore", category=UserWarning,
                         message="stft with return_complex=False is deprecated")
 logging.getLogger('nemo_logger').setLevel(logging.ERROR)
 
+
 @contextmanager
-def open_audio(input_data: Union[str, bytes]):
+def open_audio(input_data: Union[str, bytes]) -> sf.SoundFile:
+    """
+    Open audio file using soundfile library.
+
+    Args:
+        input_data: Path to the audio file or bytes data of the audio file.
+
+    Returns:
+        SoundFile object for reading audio data.
+    """
     if isinstance(input_data, str):
         # input_data is a file path
         audio_file = sf.SoundFile(input_data, 'r')
@@ -35,6 +45,7 @@ def open_audio(input_data: Union[str, bytes]):
         yield audio_file
     finally:
         audio_file.close()
+
 
 class AudioTranscriber:
     def __init__(self, asr_model_path, config_path, device='cpu'):
@@ -54,7 +65,12 @@ class AudioTranscriber:
 
     def init_config(self):
         """
-        Initialize the configuration for transcribing audio
+        Initialize the configuration for transcribing audio.
+
+        The configuration file should contain the following parameters:
+        - sr: Sample rate for audio. Default is 16000.
+        - chunk_len: Length of audio chunks in seconds. Default is 30.
+        - context_len: Length of context in seconds. Default is 5.
         """
         config_path = self.config
 
@@ -76,10 +92,36 @@ class AudioTranscriber:
         self.chunk_len_in_sec = int(transcribe_config.get('chunk_len', 30))
         self.context_len_in_sec = int(transcribe_config.get('context_len', 5))
 
+    def compare_channels(self, left_samples: np.array, right_samples: np.array, tolerance: float = 1e-4):
+        """
+        Compare left and right audio channels to check if they are the same.
+
+        Args:
+            left_samples: Left audio samples.
+            right_samples: Right audio samples.
+            tolerance: Tolerance level for comparing the two channels. Default is 1e-5.
+
+        Returns:
+            True if the two channels are the same within the tolerance level, False otherwise.
+        """
+        if left_samples is None or right_samples is None:
+            return False
+        
+        mean_absolute_diff = np.mean(np.abs(left_samples - right_samples))
+        print(f"Mean absolute difference between left and right channels: {mean_absolute_diff}")
+        return mean_absolute_diff < tolerance
+
     def get_samples(self, input_data: Union[str, bytes], target_sr: int = 16000, chunk_size: int = 1024):
         """
         Load audio file in chunks and resample if necessary.
-        Returns samples for both left and right channels separately if stereo, or only left if mono.
+
+        Args:
+            input_data: Path to the audio file or bytes data of the audio file.
+            target_sr: Target sample rate for resampling. Default is 16000.
+            chunk_size: Number of frames to read at a time. Default is 1024.
+
+        Returns:
+            Tuple of left and right audio samples. If the audio is mono, right channel is None.
         """
         with open_audio(input_data) as f:
             sample_rate = f.samplerate
@@ -105,15 +147,21 @@ class AudioTranscriber:
             left_channel = samples
             right_channel = None  # Mono audio
 
-        # If both channels are the same, return only one channel
-        if np.array_equal(left_channel, right_channel):
+        # If both channels are the same (within tolerance), return only one channel
+        if self.compare_channels(left_channel, right_channel):
             right_channel = None
 
         return left_channel, right_channel
 
     def transcribe_samples(self, samples: Tuple[np.array, np.array]):
         """
-        Transcribe audio samples for both left and right channels using the ASR model.
+        Transcribe audio samples using the ASR model. If the audio is mono, only the left channel is transcribed.
+
+        Args:
+            samples: Tuple of left and right audio samples. If the audio is mono, right channel is None.
+
+        Returns:
+            List of transcriptions with timestamps and channel information.
         """
         left_samples, right_samples = samples
         transcriptions = []
@@ -121,7 +169,7 @@ class AudioTranscriber:
 
         for channel, samples in zip(channels, [left_samples, right_samples]):
             # Skip the right channel if it's the same as the left (mono audio)
-            if left_samples is not None and right_samples is not None and np.array_equal(left_samples, right_samples) and channel == 'right':
+            if samples is None or (channel == 'right' and self.compare_channels(left_samples, right_samples)):
                 continue
 
             try:
@@ -174,12 +222,20 @@ class AudioTranscriber:
                         transcriptions.append((t, ts, channel))
             except Exception as e:
                 print(f"An error occurred: {e}")
-                
+
         return transcriptions
 
     def save_to_file(self, transcriptions: List[Tuple[str, Tuple[float, float], str]], output_dir: str, audio_file: str):
         """
         Save transcription to a text file.
+
+        Args:
+            transcriptions: List of transcriptions with timestamps and channel information.
+            output_dir: Directory to save the output text file.
+            audio_file: Path to the audio
+
+        Returns:
+            None
         """
         # Check if output directory exists
         if not os.path.exists(output_dir):
@@ -203,7 +259,17 @@ class AudioTranscriber:
                 f.write(
                     f"{transcript} {start_time:.2f} {end_time:.2f} {channel} 1.00\n")
 
-    def transcribe_api(self, input_data: Union[str, bytes], sample_rate=16000):
+    def transcribe_api(self, input_data: Union[str, bytes], sample_rate=16000) -> List[Tuple[str, Tuple[float, float], str]]:
+        """
+        Transcribe audio using the ASR model.
+
+        Args:
+            input_data: Path to the audio file or bytes data of the audio file.
+            sample_rate: Sample rate of the audio. Default is 16000.
+
+        Returns:
+            List of transcriptions with timestamps and channel information.
+        """
         sample_rate = self.sample_rate
         samples = self.get_samples(input_data, sample_rate)
         transcriptions = self.transcribe_samples(samples)
@@ -212,6 +278,13 @@ class AudioTranscriber:
     def transcribe_audio(self, audio_path: str, output_dir: str):
         """
         Transcribe audio using the ASR model.
+
+        Args:
+            audio_path: Path to the audio file or directory containing audio files.
+            output_dir: Directory to save the output text files.
+
+        Returns:
+            None
         """
         sample_rate = self.sample_rate
         audio_list = []

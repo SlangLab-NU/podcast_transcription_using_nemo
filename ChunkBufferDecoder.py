@@ -62,6 +62,8 @@ class ChunkBufferDecoder:
             self.chunk_len / self.model_stride_in_sec)
         self.blank_id = len(asr_model.decoder.vocabulary)
 
+        self.last_processed_buffer_index = 0
+
     @torch.no_grad()
     def transcribe_buffers(self, buffers: List[torch.Tensor], merge: bool = True, buffer_offset: float = 0.0) -> Tuple[str, List[Tuple[float, float]]]:
         """
@@ -76,11 +78,14 @@ class ChunkBufferDecoder:
             merged_text (str): The merged text of the transcribed audio buffers.
             time_stamps (List[Tuple[float, float]]): The list of time stamps for each prediction.
         """
-        self.buffers = buffers
-        self.data_layer.set_signal(buffers[:])
+        new_buffers = buffers[self.last_processed_buffer_index:]
+        self.data_layer.set_signal(new_buffers[:])
         self._get_batch_preds()
 
         merged_text, time_stamps = self.decode_final(merge, buffer_offset)
+
+        # Update the last processed buffer index
+        self.last_processed_buffer_index = len(buffers)
 
         return merged_text, time_stamps
 
@@ -111,9 +116,11 @@ class ChunkBufferDecoder:
             merged_text (str): The merged text of the transcribed audio buffers.
             time_stamps (List[Tuple[float, float]]): The list of time stamps for each prediction.
         """
-        self.unmerged = []
-        self.toks_unmerged = []
-        self.time_stamps = []
+        if not hasattr(self, 'unmerged'):
+            self.unmerged = []
+            self.toks_unmerged = []
+            self.time_stamps = []
+            
         # index for the first token corresponding to a chunk of audio would be len(decoded) - 1 - delay
         delay = math.ceil((self.chunk_len + (self.buffer_len -
                           self.chunk_len) / 2) / self.model_stride_in_sec)
