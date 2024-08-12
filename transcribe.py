@@ -142,30 +142,69 @@ class AudioTranscriber:
             num_frames = f.frames
             data = []
 
+            logging.debug(f"Audio shape: {num_frames} frames")
+
             # Process the audio file in chunks to save memory
             for start in range(0, num_frames, chunk_size):
                 end = min(start + chunk_size, num_frames)
                 chunk = f.read(frames=end-start, dtype='float32')
-                if sample_rate != target_sr:
-                    chunk = scipy.signal.resample(chunk, int(
-                        len(chunk) * target_sr / sample_rate))
                 data.append(chunk)
 
         samples = np.concatenate(data, axis=0)
+        logging.debug(f"Loaded audio shape: {samples.shape}")
 
         # Check if the audio is mono or multi-channel
         if samples.ndim == 2:  # Multi-channel (e.g., stereo)
+            logging.debug("Multi-channel audio detected.")
             left_channel = samples[:, 0]
             right_channel = samples[:, 1]
+
+            # Resample both channels separately if necessary
+            logging.debug(
+                f"sample_rate: {sample_rate}, target_sr: {target_sr}, sample_rate != target_sr: {sample_rate != target_sr}")
+            if sample_rate != target_sr:
+                logging.debug("Resampling left and right channels...")
+                left_channel = self.resample_channel(
+                    left_channel, sample_rate, target_sr)
+                right_channel = self.resample_channel(
+                    right_channel, sample_rate, target_sr)
         else:
+            logging.debug("Mono audio detected.")
             left_channel = samples
             right_channel = None  # Mono audio
+
+            # Resample the mono channel if necessary
+            if sample_rate != target_sr:
+                left_channel = self.resample_channel(
+                    left_channel, sample_rate, target_sr)
+
+        logging.debug(
+            f"Resampled audio shape: {left_channel.shape}, {right_channel.shape if right_channel is not None else None}")
 
         # If both channels are the same (within tolerance), return only one channel
         if self.compare_channels(left_channel, right_channel):
             right_channel = None
 
         return left_channel, right_channel
+
+    def resample_channel(self, channel_data: np.ndarray, original_sr: int, target_sr: int) -> np.ndarray:
+        """
+        Resample a single audio channel to the target sample rate.
+
+        Args:
+            channel_data (np.ndarray): The audio data to be resampled.
+            original_sr (int): The original sample rate of the audio data.
+            target_sr (int): The target sample rate for the resampled audio.
+
+        Returns:
+            np.ndarray: The resampled audio data.
+        """
+        logging.debug(f"Resampling channel from {original_sr} to {target_sr}")
+        num_samples = int(len(channel_data) * target_sr / original_sr)
+        logging.debug(
+            f"Original Samples: {len(channel_data)}, Resampled Samples: {num_samples}")
+        resampled_data = scipy.signal.resample(channel_data, num_samples)
+        return resampled_data
 
     def transcribe_samples(self, samples: Tuple[np.array, np.array]) -> List[Tuple[str, Tuple[float, float], str]]:
         """
@@ -309,7 +348,6 @@ class AudioTranscriber:
         Returns:
             None
         """
-        sample_rate = self.sample_rate
         audio_list = []
 
         # Check if audio path exists
@@ -333,7 +371,7 @@ class AudioTranscriber:
         for index, audio_file in enumerate(audio_list):
             index_message = f"Audio File {index + 1} out of {file_count} ({audio_file}):"
             print(index_message, "Sampling audio...")
-            samples = self.get_samples(audio_file, sample_rate)
+            samples = self.get_samples(audio_file)
 
             print(index_message, "Transcribing audio...")
             transcriptions = self.transcribe_samples(samples)
