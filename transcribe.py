@@ -15,9 +15,11 @@ import logging
 import os
 from io import BytesIO
 from typing import Union
+
 warnings.filterwarnings("ignore", category=UserWarning,
                         message="stft with return_complex=False is deprecated")
 logging.getLogger('nemo_logger').setLevel(logging.ERROR)
+logging.basicConfig(level=logging.DEBUG)
 
 
 @contextmanager
@@ -121,12 +123,13 @@ class AudioTranscriber:
         mean_absolute_diff = np.mean(np.abs(left_samples - right_samples))
         return mean_absolute_diff < tolerance
 
-    def get_samples(self, input_data: Union[str, bytes], target_sr: int = 16000, chunk_size: int = 1024):
+    def get_samples(self, input_data: Union[str, bytes], original_sr: int = None, target_sr: int = 16000, chunk_size: int = 1024):
         """
         Load audio file in chunks and resample if necessary.
 
         Args:
             input_data: Path to the audio file or bytes data of the audio file.
+            original_sr: Original sample rate of the audio file.
             target_sr: Target sample rate for resampling. Default is 16000.
             chunk_size: Number of frames to read at a time. Default is 1024.
 
@@ -134,7 +137,8 @@ class AudioTranscriber:
             Tuple of left and right audio samples. If the audio is mono, right channel is None.
         """
         with open_audio(input_data) as f:
-            sample_rate = f.samplerate
+            logging.debug(f"Resampling from {f.samplerate} to {target_sr}")
+            sample_rate = f.samplerate if original_sr is None else original_sr
             num_frames = f.frames
             data = []
 
@@ -179,61 +183,69 @@ class AudioTranscriber:
 
         for channel, samples in zip(channels, [left_samples, right_samples]):
             # Skip the right channel if it's the same as the left (mono audio)
+            logging.debug(f"Transcribing {channel} channel...")
+            logging.debug(
+                f"Sample Shape: {samples.shape if samples is not None else None}")
             if samples is None or (channel == 'right' and self.compare_channels(left_samples, right_samples)):
+                logging.debug(f"Skipping {channel} channel.")
                 continue
 
-            try:
-                model = self.model
-                sample_rate = self.sample_rate
-                chunk_len_in_sec = self.chunk_len_in_sec
-                context_len_in_sec = self.context_len_in_sec
+            # try:
+            model = self.model
+            sample_rate = self.sample_rate
+            chunk_len_in_sec = self.chunk_len_in_sec
+            context_len_in_sec = self.context_len_in_sec
 
-                # Buffer = context + chunk + context
-                buffer_len_in_sec = chunk_len_in_sec + 2 * context_len_in_sec
+            # Buffer = context + chunk + context
+            buffer_len_in_sec = chunk_len_in_sec + 2 * context_len_in_sec
 
-                n_buffers = int(
-                    np.ceil(len(samples) / (sample_rate * chunk_len_in_sec)))
-                buffer_len = int(sample_rate * buffer_len_in_sec)
-                sampbuffer = np.zeros([buffer_len], dtype='float32')
+            n_buffers = int(
+                np.ceil(len(samples) / (sample_rate * chunk_len_in_sec)))
+            buffer_len = int(sample_rate * buffer_len_in_sec)
+            sampbuffer = np.zeros([buffer_len], dtype='float32')
 
-                # Initialize the decoder to transcribe audio buffers
-                chunk_reader = AudioChunkIterator(
-                    samples, sample_rate, chunk_len_in_sec)
-                chunk_len = int(sample_rate * chunk_len_in_sec)
-                count = 0
-                buffer_list = []
-                buffer_offsets = []
-                for chunk in chunk_reader:
-                    count += 1
-                    chunk_len = len(chunk)
-                    sampbuffer[:-chunk_len] = sampbuffer[chunk_len:]
-                    sampbuffer[-chunk_len:] = chunk
+            # Initialize the decoder to transcribe audio buffers
+            chunk_reader = AudioChunkIterator(
+                samples, sample_rate, chunk_len_in_sec)
+            chunk_len = int(sample_rate * chunk_len_in_sec)
+            count = 0
+            buffer_list = []
+            buffer_offsets = []
 
-                    buffer_list.append(np.array(sampbuffer))
-                    # Offset by chunk length
-                    buffer_offsets.append(
-                        (count - 1) * chunk_len_in_sec - 2 * context_len_in_sec)
+            for chunk in chunk_reader:
+                count += 1
+                chunk_len = len(chunk)
+                sampbuffer[:-chunk_len] = sampbuffer[chunk_len:]
+                sampbuffer[-chunk_len:] = chunk
 
-                    if count >= n_buffers:
-                        break
+                buffer_list.append(np.array(sampbuffer))
+                # Offset by chunk length
+                buffer_offsets.append(
+                    (count - 1) * chunk_len_in_sec - 2 * context_len_in_sec)
 
-                # Keep below (chunk_len / 6); smaller the value the better the resolution
-                stride = 4
+                if count >= n_buffers:
+                    break
 
-                gc.collect()
-                if self.device == 'cuda':
-                    torch.cuda.empty_cache()
+            # Keep below (chunk_len / 6); smaller the value the better the resolution
+            stride = 4
 
-                decoder = ChunkBufferDecoder(
-                    model, stride, chunk_len_in_sec, buffer_len_in_sec)
+            gc.collect()
+            if self.device == 'cuda':
+                torch.cuda.empty_cache()
 
-                for buffer, buffer_offset in zip(buffer_list, buffer_offsets):
-                    transcription, timestamps = decoder.transcribe_buffers(
-                        [buffer], merge=False, buffer_offset=buffer_offset)
-                    for t, ts in zip(transcription, timestamps):
-                        transcriptions.append((t, ts, channel))
-            except Exception as e:
-                print(f"An error occurred: {e}")
+            decoder = ChunkBufferDecoder(
+                model, stride, chunk_len_in_sec, buffer_len_in_sec)
+
+            for buffer, buffer_offset in zip(buffer_list, buffer_offsets):
+                transcription, timestamps = decoder.transcribe_buffers(
+                    [buffer], merge=False, buffer_offset=buffer_offset)
+                for t, ts in zip(transcription, timestamps):
+                    transcriptions.append((t, ts, channel))
+            # except Exception as e:
+            #     print(f"An error occurred: {e}")
+
+        logging.debug("Transcription completed.")
+        logging.debug(f"Transcriptions: {transcriptions}")
 
         return transcriptions
 
@@ -282,8 +294,7 @@ class AudioTranscriber:
         Returns:
             List of transcriptions with timestamps and channel information.
         """
-        sample_rate = self.sample_rate
-        samples = self.get_samples(input_data, sample_rate)
+        samples = self.get_samples(input_data)
         transcriptions = self.transcribe_samples(samples)
         return transcriptions
 

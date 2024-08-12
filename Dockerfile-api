@@ -37,4 +37,5 @@ COPY application.py /nemo_asr_root/application.py
 
 ENV PYTHONPATH=/nemo_asr_root
 # Make the run_transcribe.sh script executable
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "application:app"]
+# CMD ["gunicorn", "-b", "0.0.0.0:8000", "application:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "--capture-output", "--log-level", "debug", "application:app"]

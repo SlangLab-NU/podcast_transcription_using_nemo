@@ -4,9 +4,15 @@ import base64
 from transcribe import AudioTranscriber
 import os
 import json
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 def create_transcriber():
+    """
+    Create an instance of AudioTranscriber
+    """
     cwd = os.getcwd()
     CONFIG_PATH = os.path.join(cwd, 'transcribe.cfg')
     ASR_MODEL_PATH = os.path.join(
@@ -16,6 +22,9 @@ def create_transcriber():
 
 
 def create_app():
+    """
+    Create a Flask app
+    """
     app_obj = Flask(__name__)
     # app_obj = CORS(app_obj)
     return app_obj
@@ -27,12 +36,29 @@ transciber = create_transcriber()
 
 @app.route("/")
 def index():
-    print("Request received -- Testing, Flask!")
+    """
+    Test the Flask app. This is the default route.
+    """
+    logging.debug("GET request received")
     return "Testing, Flask!"
 
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    """
+    Predict the transcription of the audio file. The audio file is sent as a base64 encoded string.
+
+    Sample request:
+    {
+    "config": {
+        "sample_rate": 16000
+        },
+    "audio": {
+        "content": "ZkxhQwAAACIQABAAAAUJABtAA+gA8AB+W8FZndQvQAyjv..."
+        }
+    }
+    """
+    logging.debug("POST request received")
     json_data = request.get_json()
     audio_encoded = json_data['audio']['content']
     sample_rate = json_data['config']['sample_rate']
