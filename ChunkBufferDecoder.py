@@ -2,6 +2,7 @@ from torch.utils.data import DataLoader
 import math
 import torch
 from typing import List, Tuple
+import logging
 
 from AudioBuffersDataLayer import AudioBuffersDataLayer
 
@@ -9,6 +10,7 @@ from AudioBuffersDataLayer import AudioBuffersDataLayer
 class ChunkBufferDecoder:
     """
     A class to decode audio buffers using a sliding window approach.
+    
     Attributes:
         asr_model (torch.nn.Module): The ASR model to use for decoding.
         stride (int): The stride in number of frames between each chunk.
@@ -35,6 +37,7 @@ class ChunkBufferDecoder:
     ):
         """
         Initialize the ChunkBufferDecoder.
+        
         Args:
             asr_model (torch.nn.Module): The ASR model to use for decoding.
             stride (int): The stride in number of frames between each chunk.
@@ -59,15 +62,24 @@ class ChunkBufferDecoder:
         self.n_tokens_per_chunk = math.ceil(
             self.chunk_len / self.model_stride_in_sec)
         self.blank_id = len(asr_model.decoder.vocabulary)
+        
+    def reset(self):
+        """
+        Reset the decoder.
+        """
+        self.buffers = []
+        self.all_preds = []
 
     @torch.no_grad()
     def transcribe_buffers(self, buffers: List[torch.Tensor], merge: bool = True, buffer_offset: float = 0.0) -> Tuple[str, List[Tuple[float, float]]]:
         """
         Transcribe a list of audio buffers.
+        
         Args:
             buffers (List[torch.Tensor]): A list of audio buffers to transcribe.
             merge (bool): Whether to merge the predictions.
             buffer_offset (float): The offset in seconds to add to the time stamps.
+            
         Returns:
             merged_text (str): The merged text of the transcribed audio buffers.
             time_stamps (List[Tuple[float, float]]): The list of time stamps for each prediction.
@@ -75,9 +87,11 @@ class ChunkBufferDecoder:
         self.buffers = buffers
         self.data_layer.set_signal(buffers[:])
         self._get_batch_preds()
+        
+        logging.info(f"Processing buffers for transcription, offset: {buffer_offset}s\n")
 
         merged_text, time_stamps = self.decode_final(merge, buffer_offset)
-
+        
         return merged_text, time_stamps
 
     def _get_batch_preds(self) -> None:
@@ -98,9 +112,11 @@ class ChunkBufferDecoder:
     def decode_final(self, merge: bool = True, buffer_offset: float = 0.0) -> Tuple[str, List[Tuple[float, float]]]:
         """
         Decode the final predictions.
+        
         Args:
             merge (bool): Whether to merge the predictions.
             buffer_offset (float): The offset in seconds to add to the time stamps.
+            
         Returns:
             merged_text (str): The merged text of the transcribed audio buffers.
             time_stamps (List[Tuple[float, float]]): The list of time stamps for each prediction.
@@ -117,13 +133,15 @@ class ChunkBufferDecoder:
         for pred in self.all_preds:
             ids, toks, times = self._greedy_decoder(
                 pred, self.asr_model.tokenizer)
-
+            
             # Adjust times to account for the buffer offset
             adjusted_times = [(t * self.model_stride_in_sec) +
-                              buffer_offset for t in times]
+                              buffer_offset - self.context_len for t in times]
+            
             decoded_frames.append(ids)
             all_toks.append(toks)
             all_times.append(adjusted_times)
+            
 
         for i, decoded in enumerate(decoded_frames):
             start_index = len(decoded) - 1 - delay
@@ -138,15 +156,17 @@ class ChunkBufferDecoder:
             return text, time_stamps
 
         merged_text = self.greedy_merge(self.unmerged)
-
+        
         return merged_text, self.get_time_stamps(self.time_stamps)
 
     def _greedy_decoder(self, preds: torch.Tensor, tokenizer: torch.nn.Module) -> Tuple[List[int], List[str], List[int]]:
         """
         Decode the predictions using a greedy decoder.
+        
         Args:
             preds (torch.Tensor): The predictions to decode.
             tokenizer (torch.nn.Module): The tokenizer to use for decoding.
+            
         Returns:
             ids (List[int]): The list of ids of the decoded tokens.
             s (List[str]): The list of decoded tokens.
@@ -163,14 +183,16 @@ class ChunkBufferDecoder:
                 s.append(tokenizer.ids_to_tokens([pred.item()])[0])
             ids.append(preds[i].item())
             times.append(i)
-
+            
         return ids, s, times
 
     def greedy_merge(self, preds: List[int]) -> str:
         """
         Merge the predictions using a greedy approach.
+        
         Args:
             preds (List[int]): The list of predictions to merge.
+            
         Returns:
             hypothesis (str): The merged hypothesis.
         """
@@ -187,9 +209,11 @@ class ChunkBufferDecoder:
     def combine_tokens_into_words(self, ids: List[int], time_stamps: List[int]) -> Tuple[str, List[Tuple[float, float]]]:
         """
         Combine the tokens into words, adjusting for the buffer's offset in the overall audio.
+        
         Args:
             ids (List[int]): The list of token ids.
             time_stamps (List[int]): The list of time stamps for each token.
+            
         Returns:
             words (str): The words of the transcribed audio.
             time_stamps (List[Tuple[float, float]]): The list of time stamps for each word.
@@ -199,9 +223,9 @@ class ChunkBufferDecoder:
         end_times = []
         current_word = []
         current_start_time = None
+        current_end_time = None
 
         tokens = self.convert_ids_to_text(ids)
-
         context_offset = self.context_len
 
         for i, token in enumerate(tokens):
@@ -213,25 +237,32 @@ class ChunkBufferDecoder:
                     words.append("".join(current_word))
                     # Adjust start and end times by subtracting the context offset
                     start_times.append(current_start_time - context_offset)
-                    end_times.append(time_stamps[i - 1] - context_offset)
+                    # Use current_end_time updated during the processing of the last token of the word
+                    end_times.append(current_end_time - context_offset)
                 current_word = [token[1:]]  # Remove leading special character
                 current_start_time = time_stamps[i]
+                current_end_time = time_stamps[i]  # Initialize end time with the start of the new word
             else:
-                if current_start_time is None:
+                if current_start_time is None:  # This should only trigger if the first token isn't a word boundary
                     current_start_time = time_stamps[i]
                 current_word.append(token)
-        if current_word:  # Append the last word if exists
+                current_end_time = time_stamps[i]  # Update end time with each token
+
+        # Append the last word if it exists
+        if current_word:
             words.append("".join(current_word))
-            start_times.append(current_start_time)
-            end_times.append(time_stamps[-1])
+            start_times.append(current_start_time - context_offset)
+            end_times.append(current_end_time - context_offset)  # Ensure the last word's end time is recorded
 
         return words, list(zip(start_times, end_times))
 
     def convert_ids_to_text(self, ids: List[int]) -> List[str]:
         """
         Convert a list of token ids to text.
+        
         Args:
             ids (List[int]): The list of token ids.
+            
         Returns:
             tokens (List[str]): The list of tokens.
         """
@@ -249,8 +280,10 @@ class ChunkBufferDecoder:
     def get_time_stamps(self, time_stamps: List[int]) -> List[Tuple[float, float]]:
         """
         Get the time stamps for each prediction.
+        
         Args:
             time_stamps (List[int]): The list of time stamps for each prediction.
+            
         Returns:
             time_stamps (List[Tuple[float, float]]): The list of time stamps for each prediction.
         """
@@ -263,8 +296,10 @@ class ChunkBufferDecoder:
 def speech_collate_fn(batch: List[Tuple[torch.Tensor, torch.Tensor]]) -> Tuple[torch.Tensor, torch.Tensor]:
     """
     Collate batch of audio signals into a single tensor with their lengths.
+    
     Args:
         batch (List[Tuple[torch.Tensor, torch.Tensor]]): The batch of audio signals.
+        
     Returns:
         audio_signal (torch.Tensor): The batch of audio signals.
         audio_lengths (torch.Tensor): The lengths of the audio signals.

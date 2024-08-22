@@ -19,7 +19,7 @@ from typing import Union
 warnings.filterwarnings("ignore", category=UserWarning,
                         message="stft with return_complex=False is deprecated")
 logging.getLogger('nemo_logger').setLevel(logging.ERROR)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 @contextmanager
@@ -104,6 +104,10 @@ class AudioTranscriber:
         self.sample_rate = int(transcribe_config.get('sr', 16000))
         self.chunk_len_in_sec = int(transcribe_config.get('chunk_len', 30))
         self.context_len_in_sec = int(transcribe_config.get('context_len', 5))
+        self.stride = int(transcribe_config.get('stride', 4))
+        
+        logging.debug(f"Sample rate: {self.sample_rate}, Chunk length: {self.chunk_len_in_sec}, Context length: {self.context_len_in_sec}, Stride: {self.stride}")
+
 
     def compare_channels(self, left_samples: np.array, right_samples: np.array, tolerance: float = 1e-4) -> bool:
         """
@@ -137,12 +141,10 @@ class AudioTranscriber:
             Tuple of left and right audio samples. If the audio is mono, right channel is None.
         """
         with open_audio(input_data) as f:
-            logging.debug(f"Resampling from {f.samplerate} to {target_sr}")
+            logging.info(f"Resampling from {f.samplerate} to {target_sr}")
             sample_rate = f.samplerate if original_sr is None else original_sr
             num_frames = f.frames
             data = []
-
-            logging.debug(f"Audio shape: {num_frames} frames")
 
             # Process the audio file in chunks to save memory
             for start in range(0, num_frames, chunk_size):
@@ -151,25 +153,24 @@ class AudioTranscriber:
                 data.append(chunk)
 
         samples = np.concatenate(data, axis=0)
-        logging.debug(f"Loaded audio shape: {samples.shape}")
 
         # Check if the audio is mono or multi-channel
         if samples.ndim == 2:  # Multi-channel (e.g., stereo)
-            logging.debug("Multi-channel audio detected.")
+            logging.info("Multi-channel audio detected.")
             left_channel = samples[:, 0]
             right_channel = samples[:, 1]
 
             # Resample both channels separately if necessary
-            logging.debug(
+            logging.info(
                 f"sample_rate: {sample_rate}, target_sr: {target_sr}, sample_rate != target_sr: {sample_rate != target_sr}")
             if sample_rate != target_sr:
-                logging.debug("Resampling left and right channels...")
+                logging.info("Resampling left and right channels...")
                 left_channel = self.resample_channel(
                     left_channel, sample_rate, target_sr)
                 right_channel = self.resample_channel(
                     right_channel, sample_rate, target_sr)
         else:
-            logging.debug("Mono audio detected.")
+            logging.info("Mono audio detected.")
             left_channel = samples
             right_channel = None  # Mono audio
 
@@ -177,9 +178,6 @@ class AudioTranscriber:
             if sample_rate != target_sr:
                 left_channel = self.resample_channel(
                     left_channel, sample_rate, target_sr)
-
-        logging.debug(
-            f"Resampled audio shape: {left_channel.shape}, {right_channel.shape if right_channel is not None else None}")
 
         # If both channels are the same (within tolerance), return only one channel
         if self.compare_channels(left_channel, right_channel):
@@ -199,9 +197,8 @@ class AudioTranscriber:
         Returns:
             np.ndarray: The resampled audio data.
         """
-        logging.debug(f"Resampling channel from {original_sr} to {target_sr}")
         num_samples = int(len(channel_data) * target_sr / original_sr)
-        logging.debug(
+        logging.info(
             f"Original Samples: {len(channel_data)}, Resampled Samples: {num_samples}")
         resampled_data = scipy.signal.resample(channel_data, num_samples)
         return resampled_data
@@ -222,12 +219,12 @@ class AudioTranscriber:
 
         for channel, samples in zip(channels, [left_samples, right_samples]):
             # Skip the right channel if it's the same as the left (mono audio)
-            logging.debug(f"Transcribing {channel} channel...")
-            logging.debug(
-                f"Sample Shape: {samples.shape if samples is not None else None}")
+            logging.info(f"Transcribing {channel} channel...")
             if samples is None or (channel == 'right' and self.compare_channels(left_samples, right_samples)):
-                logging.debug(f"Skipping {channel} channel.")
+                logging.info(f"Skipping {channel} channel.")
                 continue
+            
+            logging.info("")
 
             # try:
             model = self.model
@@ -259,32 +256,30 @@ class AudioTranscriber:
 
                 buffer_list.append(np.array(sampbuffer))
                 # Offset by chunk length
-                buffer_offsets.append(
-                    (count - 1) * chunk_len_in_sec - 2 * context_len_in_sec)
+                buffer_offsets.append((count - 1) * chunk_len_in_sec)
 
                 if count >= n_buffers:
                     break
 
             # Keep below (chunk_len / 6); smaller the value the better the resolution
-            stride = 4
+            stride = self.stride
 
             gc.collect()
             if self.device == 'cuda':
                 torch.cuda.empty_cache()
 
             decoder = ChunkBufferDecoder(
-                model, stride, chunk_len_in_sec, buffer_len_in_sec)
+                model, stride, chunk_len_in_sec, buffer_len_in_sec, context_len_in_sec)
 
+            count = 1
             for buffer, buffer_offset in zip(buffer_list, buffer_offsets):
+                decoder.reset()
                 transcription, timestamps = decoder.transcribe_buffers(
                     [buffer], merge=False, buffer_offset=buffer_offset)
                 for t, ts in zip(transcription, timestamps):
                     transcriptions.append((t, ts, channel))
             # except Exception as e:
             #     print(f"An error occurred: {e}")
-
-        logging.debug("Transcription completed.")
-        logging.debug(f"Transcriptions: {transcriptions}")
 
         return transcriptions
 
@@ -375,6 +370,9 @@ class AudioTranscriber:
 
             print(index_message, "Transcribing audio...")
             transcriptions = self.transcribe_samples(samples)
+            
+            for t, ts, channel in transcriptions:
+                print(f"{t} {ts} {channel}")
 
             print(index_message, "Saving transcription...")
             self.save_to_file(transcriptions, output_dir, audio_file)
