@@ -5,11 +5,13 @@ FROM python:3.8
 RUN apt-get update && apt-get install -y git sox libsndfile1 ffmpeg wget unzip
 
 # Install Python dependencies
-RUN pip install numpy flask-cors omegaconf pytest scipy torch torchvision torchaudio Flask gunicorn unidecode
+RUN pip install numpy flask-cors omegaconf pytest scipy torch torchvision torchaudio Flask gunicorn unidecode Cython wheel
 
 # Clone NeMo repository and install NeMo ASR
 ARG BRANCH=r1.13.0
-RUN pip install git+https://github.com/NVIDIA/NeMo.git@$BRANCH#egg=nemo_toolkit[asr]
+# RUN pip install git+https://github.com/NVIDIA/NeMo.git@$BRANCH#egg=nemo_toolkit[asr]
+# Changed to the line below due to a Deprecation warning
+RUN pip install "nemo_toolkit[asr] @ git+https://github.com/NVIDIA/NeMo.git@$BRANCH"
 RUN pip install huggingface_hub==0.22.0
 
 
