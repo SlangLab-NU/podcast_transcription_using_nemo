@@ -5,15 +5,12 @@ FROM python:3.8
 RUN apt-get update && apt-get install -y git sox libsndfile1 ffmpeg wget unzip
 
 # Install Python dependencies
-RUN pip install numpy flask-cors omegaconf pytest scipy torch torchvision torchaudio Flask gunicorn unidecode Cython wheel
+RUN pip install numpy flask-cors omegaconf pytest scipy torch torchvision torchaudio Flask gunicorn unidecode Cython wheel ffmpeg-python
 
 # Clone NeMo repository and install NeMo ASR
 ARG BRANCH=r1.13.0
-# RUN pip install git+https://github.com/NVIDIA/NeMo.git@$BRANCH#egg=nemo_toolkit[asr]
-# Changed to the line below due to a Deprecation warning
 RUN pip install "nemo_toolkit[asr] @ git+https://github.com/NVIDIA/NeMo.git@$BRANCH"
 RUN pip install huggingface_hub==0.22.0
-
 
 # Download and unzip the ASR model
 RUN mkdir -p /nemo_asr_root/model && \
@@ -35,6 +32,7 @@ COPY AudioBuffersDataLayer.py /nemo_asr_root/AudioBuffersDataLayer.py
 COPY AudioChunkIterator.py /nemo_asr_root/AudioChunkIterator.py
 COPY ChunkBufferDecoder.py /nemo_asr_root/ChunkBufferDecoder.py
 COPY transcribe.py /nemo_asr_root/transcribe.py
+COPY audio.py /nemo_asr_root/audio.py
 
 # Make the run_transcribe.sh script executable
 RUN chmod +x /nemo_asr_root/run_transcribe.sh
