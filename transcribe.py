@@ -15,6 +15,7 @@ import logging
 import os
 from io import BytesIO
 from typing import Union
+from audio import convert_mp3_to_wav
 
 warnings.filterwarnings("ignore", category=UserWarning,
                         message="stft with return_complex=False is deprecated")
@@ -23,12 +24,12 @@ logging.basicConfig(level=logging.INFO)
 
 
 @contextmanager
-def open_audio(input_data: Union[str, bytes]) -> sf.SoundFile:
+def open_audio(input_data: Union[str, bytes, BytesIO]) -> sf.SoundFile:
     """
     Open audio file using soundfile library.
 
     Args:
-        input_data: Path to the audio file or bytes data of the audio file.
+        input_data: Path to the audio file, bytes data of the audio file, or BytesIO object.
 
     Returns:
         SoundFile object for reading audio data.
@@ -40,8 +41,11 @@ def open_audio(input_data: Union[str, bytes]) -> sf.SoundFile:
         # input_data is bytes data
         audio_buffer = BytesIO(input_data)
         audio_file = sf.SoundFile(audio_buffer, 'rb')
+    elif isinstance(input_data, BytesIO):
+        # input_data is already a BytesIO object
+        audio_file = sf.SoundFile(input_data, 'rb')
     else:
-        raise ValueError("input_data must be a file path (str) or bytes data")
+        raise ValueError("input_data must be a file path (str), bytes data, or BytesIO object")
 
     try:
         yield audio_file
@@ -140,6 +144,11 @@ class AudioTranscriber:
         Returns:
             Tuple of left and right audio samples. If the audio is mono, right channel is None.
         """
+        # Convert MP3 to WAV if necessary
+        if (isinstance(input_data, str) and input_data.endswith('.mp3') 
+            or isinstance(input_data, bytes)):
+            input_data = convert_mp3_to_wav(input_data)
+
         with open_audio(input_data) as f:
             logging.info(f"Resampling from {f.samplerate} to {target_sr}")
             sample_rate = f.samplerate if original_sr is None else original_sr
@@ -355,7 +364,7 @@ class AudioTranscriber:
         elif os.path.isdir(audio_path):
             for root, _, files in os.walk(audio_path):
                 for file in files:
-                    if file.endswith('.wav'):
+                    if file.endswith('.wav') or file.endswith('.mp3'):
                         audio_list.append(os.path.join(root, file))
         else:
             raise ValueError(f"Invalid audio path: {audio_path}")
