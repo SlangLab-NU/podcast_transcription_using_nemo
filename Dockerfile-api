@@ -5,7 +5,7 @@ FROM python:3.8
 RUN apt-get update && apt-get install -y git sox libsndfile1 ffmpeg wget unzip
 
 # Install Python dependencies
-RUN pip install numpy flask-cors omegaconf pytest scipy torch torchvision torchaudio Flask gunicorn Cython unidecode
+RUN pip install numpy flask-cors omegaconf pytest scipy torch torchvision torchaudio Flask gunicorn Cython unidecode ffmpeg-python
 
 # Clone NeMo repository and install NeMo ASR
 ARG BRANCH=r1.13.0
@@ -34,6 +34,7 @@ COPY AudioBuffersDataLayer.py /nemo_asr_root/AudioBuffersDataLayer.py
 COPY AudioChunkIterator.py /nemo_asr_root/AudioChunkIterator.py
 COPY transcribe.py /nemo_asr_root/transcribe.py
 COPY application.py /nemo_asr_root/application.py
+COPY audio.py /nemo_asr_root/audio.py
 
 ENV PYTHONPATH=/nemo_asr_root
 # Make the run_transcribe.sh script executable
