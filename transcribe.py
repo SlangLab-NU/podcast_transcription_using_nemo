@@ -37,13 +37,10 @@ def open_audio(input_data: Union[str, bytes, BytesIO]) -> sf.SoundFile:
     if isinstance(input_data, str):
         # input_data is a file path
         audio_file = sf.SoundFile(input_data, 'r')
-    elif isinstance(input_data, bytes):
-        # input_data is bytes data
-        audio_buffer = BytesIO(input_data)
+    elif isinstance(input_data, (bytes, BytesIO)):
+        # input_data is bytes data or BytesIO object
+        audio_buffer = BytesIO(input_data) if isinstance(input_data, bytes) else input_data
         audio_file = sf.SoundFile(audio_buffer, 'rb')
-    elif isinstance(input_data, BytesIO):
-        # input_data is already a BytesIO object
-        audio_file = sf.SoundFile(input_data, 'rb')
     else:
         raise ValueError("input_data must be a file path (str), bytes data, or BytesIO object")
 
@@ -365,6 +362,7 @@ class AudioTranscriber:
             for root, _, files in os.walk(audio_path):
                 for file in files:
                     if file.endswith('.wav') or file.endswith('.mp3'):
+                        # TODO: Should check file header instead of extension
                         audio_list.append(os.path.join(root, file))
         else:
             raise ValueError(f"Invalid audio path: {audio_path}")
