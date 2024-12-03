@@ -26,7 +26,7 @@ RUN mkdir -p /nemo_asr_root/sample
 WORKDIR /nemo_asr_root
 
 # Copy scripts and configuration files into the container
-COPY run_transcribe.sh /nemo_asr_root/run_transcribe.sh
+COPY run_transcribe_sfu.sh /nemo_asr_root/run_transcribe_sfu.sh
 COPY transcribe.cfg /nemo_asr_root/transcribe.cfg
 COPY AudioBuffersDataLayer.py /nemo_asr_root/AudioBuffersDataLayer.py
 COPY AudioChunkIterator.py /nemo_asr_root/AudioChunkIterator.py
@@ -34,8 +34,8 @@ COPY ChunkBufferDecoder.py /nemo_asr_root/ChunkBufferDecoder.py
 COPY transcribe.py /nemo_asr_root/transcribe.py
 COPY audio.py /nemo_asr_root/audio.py
 
-# Make the run_transcribe.sh script executable
-RUN chmod +x /nemo_asr_root/run_transcribe.sh
-
+# Make the run_transcribe_sfu.sh script executable
+RUN chmod +x /nemo_asr_root/run_transcribe_sfu.sh
+ 
 # Entrypoint to run the bash script
-ENTRYPOINT ["/nemo_asr_root/run_transcribe.sh"]
+ENTRYPOINT ["/nemo_asr_root/run_transcribe_sfu.sh"]
